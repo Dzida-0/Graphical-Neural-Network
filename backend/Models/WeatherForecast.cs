@@ -1,4 +1,4 @@
-namespace Graphic_Neural_Network
+namespace Graphic_Neural_Network.backend.Models
 {
     public class WeatherForecast
     {

@@ -1,3 +1,4 @@
+using Graphic_Neural_Network.backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Graphic_Neural_Network.backend.Controllers

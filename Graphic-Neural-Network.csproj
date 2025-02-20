@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="backend\Models\" />
     <Folder Include="docs\" />
     <Folder Include="deployment\" />
   </ItemGroup>
