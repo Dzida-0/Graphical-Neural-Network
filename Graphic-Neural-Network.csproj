@@ -5,13 +5,20 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Graphic_Neural_Network</RootNamespace>
-    <UserSecretsId>57954750-b2e9-4a2e-aba5-1c4876319274</UserSecretsId>
+    <UserSecretsId>3ff6ec2d-ebf7-4082-8c72-c43c9bc0a88a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="backend\Models\" />
+    <Folder Include="docs\" />
+    <Folder Include="deployment\" />
   </ItemGroup>
 
 </Project>
