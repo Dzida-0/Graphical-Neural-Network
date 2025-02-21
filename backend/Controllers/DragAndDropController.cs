@@ -16,11 +16,11 @@ namespace Graphic_Neural_Network.backend.Controllers
             {
                 _circles = new List<DragAndDropNetwork>
                 {
-                    new DragAndDropNetwork { Id = 1, PosX = 50, PosY = 50},
-                    new DragAndDropNetwork { Id = 2, PosX = 150, PosY = 100},
-                    new DragAndDropNetwork { Id = 3, PosX = 200, PosY = 200},
-                    new DragAndDropNetwork { Id = 4, PosX = 300, PosY = 15 },
-                    new DragAndDropNetwork { Id = 5, PosX = 400, PosY = 250 }
+                    new DragAndDropNetwork { Id = 1, PosX = 25, PosY = 33, layer = 0},
+                    new DragAndDropNetwork { Id = 2, PosX = 25, PosY = 66, layer = 0},
+                    new DragAndDropNetwork { Id = 3, PosX = 50, PosY = 50, layer = 1},
+                    new DragAndDropNetwork { Id = 4, PosX = 75, PosY = 33, layer = 2 },
+                    new DragAndDropNetwork { Id = 5, PosX = 75, PosY = 66, layer = 2 }
                 };
             }
         }
