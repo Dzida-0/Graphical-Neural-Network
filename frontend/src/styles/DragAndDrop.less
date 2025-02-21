@@ -1,0 +1,49 @@
+﻿// Define reusable variables
+@circle-size: 50px;
+@delete-area-height: 100px;
+@drag-box-bg: #f0f0f0;
+@delete-area-bg: #ffcccc;
+@delete-area-hover-bg: #ff9999;
+@circle-bg: blue;
+
+#drag-and-drop-box {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    .drag-area {
+        flex: 1;
+        position: relative;
+        background-color: @drag-box-bg;
+        overflow: hidden;
+    }
+
+.circle {
+    position: absolute;
+    width: @circle-size;
+    height: @circle-size;
+    border-radius: 50%;
+    background-color: @circle-bg;
+    cursor: grab;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.1); // Slightly enlarge on hover
+    }
+}
+.delete-area {
+    height: @delete-area-height;
+    background-color: @delete-area-bg;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+    transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+        background-color: @delete-area-hover-bg;
+    }
+}
+}
