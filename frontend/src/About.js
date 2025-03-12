@@ -1,12 +1,12 @@
-﻿import React from "react";
-//import GraphPlot from "./GraphPlot";
-import DragAndDrop from "./DragAndDrop";
-const About = () => {
-    return (
-        <div>
-            <DragAndDrop />
-        </div>
-    );
-};
+﻿import { NNProvider } from "./test/NNData";
+import SliderManager from "./test/SliderManager";
+import { DragDropNN } from "./test/DragDropNN";
 
-export default About;
+export default function PageSimpleNNa() {
+    return (
+        <NNProvider>
+            <DragDropNN />
+            <SliderManager />
+        </NNProvider>
+    );
+}
