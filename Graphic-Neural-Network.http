@@ -1,4 +1,4 @@
-@Graphic_Neural_Network_HostAddress = http://localhost:5110
+@Graphic_Neural_Network_HostAddress = http://localhost:5001
 
 GET {{Graphic_Neural_Network_HostAddress}}/weatherforecast/
 Accept: application/json

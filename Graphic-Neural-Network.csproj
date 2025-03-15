@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Graphic_Neural_Network</RootNamespace>
-    <UserSecretsId>3ff6ec2d-ebf7-4082-8c72-c43c9bc0a88a</UserSecretsId>
+    <UserSecretsId>53527ca9-4581-4dca-bf8c-e8bbf5ee7ac7</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
@@ -16,8 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="docs\" />
-    <Folder Include="deployment\" />
+    <Folder Include="backend\" />
   </ItemGroup>
 
 </Project>
