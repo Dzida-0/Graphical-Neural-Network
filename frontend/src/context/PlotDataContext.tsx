@@ -1,6 +1,6 @@
 ﻿import React, { createContext, useState, useContext } from "react";
 import PlotData from "../models/PlotData";
-import { changeData } from "./../api/PlotDataAPI";
+import { PlotAPI } from "./../api/PlotDataAPI";
 
 interface PlotDataContextInterface {
     plotData: PlotData;
@@ -12,12 +12,22 @@ const PlotDataContext = createContext<PlotDataContextInterface | undefined>(unde
 export const PlotDataProvider: React.FC<{ children: React.ReactNode; pageId: number }> = ({ children, pageId }) => {
     const [plotData, setPlotData] = useState(new PlotData());
 
-    const generateData = () => {
-        setPlotData((prevData) => {
-            const newData = changeData("d", pageId, 1);
-            return newData instanceof PlotData ? newData : prevData;
-        });
+    const generateData = async () => {
+     
+
+        try {
+            const newData = await PlotAPI("generate", pageId, "POST");
+            
+
+            if (newData) {
+                setPlotData(new PlotData(newData.pointsCount, newData.classCount, newData.points));
+            }
+        } catch (error) {
+            console.error("Error in generateData:", error);
+        }
     };
+
+
 
     return (
         <PlotDataContext.Provider value={{ plotData, generateData }}>

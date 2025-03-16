@@ -1,7 +1,9 @@
-﻿
+﻿import Point from './Point';
+
 export default class PlotData {
     pointsCount: number;
     classCount: number;
+    points: Point[];
     classColors: { [key: number]: string } = {
         0: "blue",
         1: "red",
@@ -10,9 +12,10 @@ export default class PlotData {
         4: "green"
     };
 
-    constructor() {
-        this.pointsCount = 200;
-        this.classCount = 2;
+    constructor(newPointsCount?: number, newClassCount?: number, newPoints?: Point[],) {
+        this.pointsCount = newPointsCount ?? 200;
+        this.classCount = newClassCount ?? 2;
+        this.points = newPoints ??  Array.from({ length: this.pointsCount }, () => new Point(0, 0, 0));
 
     }
 

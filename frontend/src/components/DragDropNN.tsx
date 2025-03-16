@@ -2,7 +2,7 @@
 import { useNetwork } from "./../context/NetworkContext";
 import { JSX } from "react/jsx-runtime";
 
-export function DragDropNN() {
+export default function DragDropNN() {
     const { network, addNeuron, removeNeuron } = useNetwork();
     const [draggedNeuron, setDraggedNeuron] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -37,7 +37,7 @@ export function DragDropNN() {
     const handleCreate = (e: React.MouseEvent) => {
         e.preventDefault();
         setNewNeuronDragging(true);
-        setDraggedNeuron("new_0"); // Fake index for the new neuron
+        setDraggedNeuron("new_0"); 
         setIsDragging(true);
     };
 
@@ -74,10 +74,10 @@ export function DragDropNN() {
     };
 
     return (
-        <div className="relative flex flex-col bg-gray-100 w-screen h-screen">
-            {/* Top Controls */}
-            <div className="flex items-center p-4 bg-gray-300">
-                {/* Always show ➕ */}
+        <div className="relative flex flex-col bg-gray-100 w-full h-screen">
+            {/* Controls */}
+            <div className="flex items-center justify-center p-4 bg-gray-300">
+                {/*  ➕ */}
                 <button
                     className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
                     onClick={handleCreate}
@@ -85,7 +85,7 @@ export function DragDropNN() {
                     ➕
                 </button>
 
-                {/* Show ✖ only when dragging */}
+                {/* ✖ */}
                 {isDragging && (
                     <div
                         className="w-12 h-12 ml-4 rounded-full bg-red-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
@@ -97,60 +97,50 @@ export function DragDropNN() {
                 )}
             </div>
 
-            <div>
-            {/* Network Container */}
-            <div className="absolute flex flex-col items-center w-full h-full p-12">
-                <div className={`grid grid-cols-${network.layers.length || 1} gap-8 w-full`}>
-                    {network.layers.map((_, layerIndex) => (
+            {/* Main Content */}
+            <div className="relative flex justify-center items-center w-full h-full">
+                {/* Connections  */}
+                <div className="absolute w-full h-full pointer-events-none">
+                    <svg className="w-full h-full">{drawConnections()}</svg>
+                </div>
+
+                {/* Neuron  */}
+                <div className="flex justify-center items-center space-x-8">
+                    {network.layers.map((layer, layerIndex) => (
                         <div
                             key={layerIndex}
-                            className="w-[100px] p-4 bg-gray-300 border-2 border-black rounded-lg shadow-md flex flex-col items-center"
+                            className="flex flex-col items-center bg-gray-300 p-4 border-2 border-black rounded-lg shadow-md w-[150px] min-h-[300px] justify-center"
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => handleDrop(layerIndex)}
                         >
                             <h3 className="text-lg font-semibold">{`H${layerIndex}`}</h3>
+                            <div className="flex flex-col items-center space-y-4 mt-4">
+                                {Array.from({ length: layer.neuronsNumber }).map((_, neuronIndex) => (
+                                    <div
+                                        key={`${layerIndex}-${neuronIndex}`}
+                                        className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-grab"
+                                        draggable
+                                        onDragStart={() => handleDragStart(layerIndex, neuronIndex)}
+                                    >
+                                        {layer.biases?.[neuronIndex] ?? ""}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Connections */}
-            <div className="absolute w-full h-full pointer-events-none">
-                <svg className="w-full h-full">{drawConnections()}</svg>
-            </div>
-
-            {/* Neurons */}
-            <div className="absolute w-full h-full flex justify-around items-center">
-                {network.layers.map((layer, layerIndex) => (
-                    <div
-                        key={layerIndex}
-                        className="flex flex-col items-center bg-red-300 justify-between min-w-[150px] p-4"
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={() => handleDrop(layerIndex)}
-                    >
-                        {Array.from({ length: layer.neuronsNumber }).map((_, neuronIndex) => (
-                            <div
-                                key={`${layerIndex}-${neuronIndex}`}
-                                className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-grab"
-                                draggable
-                                onDragStart={() => handleDragStart(layerIndex, neuronIndex)}
-                            >
-                                {layer.biases?.[neuronIndex] ?? ""}
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </div>
-
-            {/* Draggable new neuron */}
+            {/*  new neuron */}
             {newNeuronDragging && (
                 <div
-                    className="absolute top-20 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-grabbing"
+                    className="absolute top-24 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-grabbing"
                     draggable
                     onDragStart={() => setDraggedNeuron("new_0")}
                 >
                     +
                 </div>
             )}
-            </div>
         </div>
     );
 }

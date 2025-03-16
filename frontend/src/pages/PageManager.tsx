@@ -57,7 +57,6 @@ export default function AppCore() {
                     index === currentPageIndex && <SinglePage key={page.id} id={page.id} />
                 ))}
             </div>
-            <SinglePage key={10} id={10} />
         </div>
     );
 }

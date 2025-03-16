@@ -13,9 +13,8 @@ export default class Network {
 
     constructor() {
         this.layers = [
-            new Layer(1, this.inputsNumber),
-            new Layer(3, 1),
-            new Layer(this.outputsNumber, 3),
+            new Layer(1, 2, [0], [[-0.5, -0.8]]),
+            new Layer(2, 1, [0, 1], [[0.7], [-1]])
         ];
     }
 
@@ -71,5 +70,23 @@ export default class Network {
         // remove layer
         this.layers.splice(laterNumber, 1);
         this.hidenLayerCount--;
+    }
+
+    updateBaies(layerNumber: number, neuronNumber: number, newBias: number) {
+        this.layers[layerNumber].updateBias(neuronNumber, newBias);
+    }
+
+    updateWeight(layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) {
+        this.layers[layerNumber].upadateWeight(neuronNumber, inputNumber, newWeight);
+    }
+
+    predict(inputs: number[]) {
+        
+        let outputs = inputs;
+        this.layers.forEach((layer: Layer) => {
+            outputs = layer.layerPredict(outputs);
+        });
+        //console.log(outputs);
+        return outputs.indexOf(Math.max(...outputs));;
     }
 }

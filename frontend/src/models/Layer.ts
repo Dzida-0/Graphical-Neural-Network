@@ -11,7 +11,9 @@ export default class Layer {
         this.neuronsNumber = neurons;
         this.prevLayerNeuronsNumber = prevLayerneurons;
         this.biases = baiesesList ?? new Array(this.neuronsNumber).fill(0);
-        this.weights = weightsList ?? new Array(this.neuronsNumber).fill(new Array(this.prevLayerNeuronsNumber).fill(0));
+        this.weights = weightsList ?? Array.from({ length: this.neuronsNumber }, () => new Array(this.prevLayerNeuronsNumber).fill(0));
+
+
 
     }
 
@@ -25,5 +27,31 @@ export default class Layer {
         this.neuronsNumber--;
         this.biases.splice(neuronNumber, 1);
         this.weights.splice(neuronNumber, 1);
+    }
+
+    updateBias(neuronNumber: number ,newBias: number) {
+        this.biases[neuronNumber] = newBias;
+    }
+
+    upadateWeight(neuronNumber: number, inputNumber: number, newWeight: number) {
+        console.log("a", this.weights);
+        this.weights[neuronNumber][inputNumber] = newWeight;
+        console.log("b" ,this.weights);
+    }
+
+    sigmoid(x: number) { return 1 / (1 + Math.exp(-x)); }
+
+
+    layerPredict(inputs: number[]) {
+        const outputs = new Array(this.neuronsNumber).fill(0);
+
+        for (let i = 0; i < this.neuronsNumber; i++) {
+            let sum = this.biases[i];
+            for (let j = 0; j < this.prevLayerNeuronsNumber; j++) {
+                sum += inputs[j] * this.weights[i][j];
+            }
+            outputs[i] = this.sigmoid(sum); 
+        }
+        return outputs;
     }
 }

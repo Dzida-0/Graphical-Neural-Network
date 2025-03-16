@@ -8,6 +8,9 @@ interface NetworkContextInterface {
     removeNeuron: (layerIndex: number, neuronIndex: number) => void;
     addLayer: (index: number) => void;
     removeLayer: (index: number) => void;
+    predictPoints: (inputs: number[]) => number;
+    updateBias: (layerNumber: number, neuronNumber: number, newBias: number) => void;
+    updateWeight: (layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) => void;
 }
 
 const NetworkContext = createContext<NetworkContextInterface | undefined>(undefined);
@@ -54,8 +57,30 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
         });
     };
 
+    const updateBias = (layerNumber: number, neuronNumber: number, newBias: number) => {
+        setNetwork((prevNetwork) => {
+            const newNetwork = new Network();
+            Object.assign(newNetwork, prevNetwork);
+            newNetwork.updateBaies(layerNumber, neuronNumber, newBias);
+            return newNetwork;
+        });
+    }
+
+    const updateWeight = (layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) => {
+        setNetwork((prevNetwork) => {
+            const newNetwork = new Network();
+            Object.assign(newNetwork, prevNetwork);
+            newNetwork.updateWeight(layerNumber, neuronNumber, inputNumber, newWeight);
+            return newNetwork;
+        });
+    }
+
+    const predictPoints = (inputs: number[]) => {
+        return network.predict(inputs);
+    };
+
     return (
-        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer }}>
+        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight }}>
             {children}
         </NetworkContext.Provider>
     );
