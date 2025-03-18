@@ -35,7 +35,37 @@
                     pointClass = 1;
                     y = random.NextDouble() * (1 - a * x + b) + a * x + b;
                 }
-                Points[i] = new Point(i, x, y, pointClass); ;
+                Points[i] = new Point(i, x *100, y * 100, pointClass); ;
+            }
+
+        }
+
+        public void GenerateCirclePoints()
+        {
+            Random random = new Random();
+            double y, x;
+            int pointClass;
+            for (int i = 0; i < ElementCount; i++)
+            {
+                
+                if (random.NextDouble() < 0.5)
+                {
+                    pointClass = 0;
+                    x = random.NextDouble()  - 0.5;
+                    y = random.NextDouble() - 0.5;
+
+                }
+                else
+                {
+                    pointClass = 1;
+                    x = random.NextDouble() - 0.5;
+                    if (x < 0) x -= 0.5;
+                    else x += 0.5;
+                    y = random.NextDouble() - 0.5;
+                    if (y < 0) y -= 0.5;
+                    else y += 0.5;
+                }
+                Points[i] = new Point(i, x * 100, y * 100, pointClass); ;
             }
 
         }

@@ -19,12 +19,12 @@ export default function Plot() {
         ctx.clearRect(0, 0, size, size);
 
         // Predictions
-        const resolution = 5; 
+        const resolution = 2;
         for (let x = 0; x < size; x += resolution) {
             for (let y = 0; y < size; y += resolution) {
                 const normX = (x / size) * 2 - 1;
                 const normY = (y / size) * 2 - 1;
-                const predictedClass = predictPoints([normX, normY]); 
+                const predictedClass = predictPoints([normX * 100, normY * 100 ]); 
                 ctx.fillStyle = predictedClass === 0 ? "rgba(173, 216, 230, 0.5)" : "rgba(255, 182, 193, 0.5)"; 
                 ctx.fillRect(x, y, resolution, resolution);
             }
@@ -34,7 +34,7 @@ export default function Plot() {
         plotData.points.forEach((point: Point) => {
             ctx.fillStyle = point.class === 0 ? "blue" : "red";
             ctx.beginPath();
-            ctx.arc((point.x + 1) * size / 2, (point.y + 1) * size / 2, 5, 0, Math.PI * 2);
+            ctx.arc((point.x / 100 + 1) * size / 2, (point.y / 100 + 1) * size / 2, 5, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         });

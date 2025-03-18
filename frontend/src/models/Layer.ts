@@ -11,7 +11,9 @@ export default class Layer {
         this.neuronsNumber = neurons;
         this.prevLayerNeuronsNumber = prevLayerneurons;
         this.biases = baiesesList ?? new Array(this.neuronsNumber).fill(0);
-        this.weights = weightsList ?? Array.from({ length: this.neuronsNumber }, () => new Array(this.prevLayerNeuronsNumber).fill(0));
+        this.weights = weightsList ??  Array.from({ length: this.neuronsNumber }, () =>
+            new Array(this.prevLayerNeuronsNumber).fill(0).map(() => Math.random() * 2 - 1)
+        );
 
 
 
@@ -34,12 +36,10 @@ export default class Layer {
     }
 
     upadateWeight(neuronNumber: number, inputNumber: number, newWeight: number) {
-        console.log("a", this.weights);
         this.weights[neuronNumber][inputNumber] = newWeight;
-        console.log("b" ,this.weights);
     }
 
-    sigmoid(x: number) { return 1 / (1 + Math.exp(-x)); }
+    sigmoid(x: number) { return 1 / (1 + Math.exp(-x)) }
 
 
     layerPredict(inputs: number[]) {

@@ -19,7 +19,7 @@ namespace Graphic_Neural_Network.backend.Controlers
         public ActionResult<PlotData> GeneratePlot([FromBody] GeneratePlotRequest request)
         {
             _data[request.pageId] = new PlotData();
-            _data[request.pageId].GenerateLinearPoints();
+            _data[request.pageId].GenerateCirclePoints();
             return Ok(_data[request.pageId]);
         }
 

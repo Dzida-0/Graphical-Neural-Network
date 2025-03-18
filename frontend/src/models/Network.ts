@@ -9,13 +9,15 @@ export default class Network {
     inputsNumber: number = 2;
     outputsNumber: number = 2;
     //
-    hidenLayerCount: number = 2;
+    hidenLayerCount: number = 4;
 
     constructor() {
         this.layers = [
-            new Layer(1, 2, [0], [[-0.5, -0.8]]),
-            new Layer(2, 1, [0, 1], [[0.7], [-1]])
-        ];
+            new Layer(4, 2),
+       
+            new Layer(2, 4)
+           
+        ]
     }
 
 
@@ -54,7 +56,11 @@ export default class Network {
             this.layers.splice(index, 0, new Layer(1, this.layers[index].neuronsNumber));
         // update next layer
         this.layers[index + 1].prevLayerNeuronsNumber = 1;
-        this.layers[index + 1].weights = new Array(this.layers[index + 1].neuronsNumber).fill(new Array(1).fill(0));
+        this.layers[index + 1].weights = Array.from(
+            { length: this.layers[index + 1].neuronsNumber },
+            () => new Array(1).fill(0)
+        );
+
         this.hidenLayerCount++;
     }
 
@@ -87,6 +93,6 @@ export default class Network {
             outputs = layer.layerPredict(outputs);
         });
         //console.log(outputs);
-        return outputs.indexOf(Math.max(...outputs));;
+        return outputs;
     }
 }

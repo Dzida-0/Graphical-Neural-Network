@@ -76,7 +76,8 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
     }
 
     const predictPoints = (inputs: number[]) => {
-        return network.predict(inputs);
+        const outputs = network.predict(inputs);
+        return outputs.indexOf(Math.max(...outputs));
     };
 
     return (
