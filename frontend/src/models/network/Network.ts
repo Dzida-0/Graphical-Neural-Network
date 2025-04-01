@@ -14,8 +14,10 @@ export default class Network {
     constructor() {
         this.layers = [
             new Layer(4, 2),
-       
-            new Layer(2, 4)
+            new Layer(2, 4),
+            new Layer(10, 2),
+            new Layer(7, 10),
+            new Layer(2, 10)
            
         ]
     }
@@ -51,7 +53,7 @@ export default class Network {
     addLayer(index: number) {
         if (this.hidenLayerCount == this.maxHidenLayers) return;
         if (index == 0)
-            this.layers.splice(index, 0, new Layer(1, 2));
+            this.layers.splice(0, 0, new Layer(1, 2));
         else
             this.layers.splice(index, 0, new Layer(1, this.layers[index].neuronsNumber));
         // update next layer
@@ -84,6 +86,16 @@ export default class Network {
 
     updateWeight(layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) {
         this.layers[layerNumber].upadateWeight(neuronNumber, inputNumber, newWeight);
+    }
+
+    updateOutputsNumber(count: number) {
+        if (count == -1 && this.outputsNumber == 2) return;
+        if (count == 1 && this.outputsNumber == 5) return;
+        this.outputsNumber += count;
+        if(count < 0 )
+            this.layers[this.hidenLayerCount].removeNeuron(this.layers[this.hidenLayerCount].neuronsNumber-1);
+        else
+            this.layers[this.hidenLayerCount].addNeuron();
     }
 
     predict(inputs: number[]) {

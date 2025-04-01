@@ -7,17 +7,20 @@
         public int ElementCount { get; set; }
         public int ClassCount { get; set; }
         public Point[] Points { get; set; }
+        public double[] ClassProbability { get; set; }
+        private NumberGenerator _numberGenerator { get; set; }
 
         public PlotData()
         {
             ElementCount = 100;
             ClassCount = 2;
+            ClassProbability = new double[] { 0.5 , 0.5};
             Points = new Point[ElementCount];
+            _numberGenerator = new NumberGenerator();
         }
 
         public void GenerateLinearPoints()
         {
-            Random random = new Random();
             double a = random.NextDouble() * 2 - 1;
             double b = random.NextDouble() - 0.5;
             double y, x;
@@ -35,7 +38,7 @@
                     pointClass = 1;
                     y = random.NextDouble() * (1 - a * x + b) + a * x + b;
                 }
-                Points[i] = new Point(i, x *100, y * 100, pointClass); ;
+                Points[i] = new Point(i, x *100, y * 100, pointClass);
             }
 
         }

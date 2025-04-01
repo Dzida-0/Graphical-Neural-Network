@@ -1,5 +1,5 @@
-﻿import Network from "./../../models/Network";
-import Point from "./../../models/Point";
+﻿import Network from "../../models/network/Network";
+import Point from "../../models/data/Point";
 import NetworkLearning from "./../../models/NetworkLearning";
 
 

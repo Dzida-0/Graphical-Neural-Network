@@ -1,12 +1,12 @@
 ﻿import { useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "./collapsibleLib/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Collapsible({ title, children }: { title: string; children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <div className="border rounded-2xl shadow-md p-4 bg-white w-full max-w-md">
+        <div className="border rounded-2xl shadow-md p-4 bg-white w-full">
             <Button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between">
                 {title}
                 <span>{isOpen ? "▲" : "▼"}</span>

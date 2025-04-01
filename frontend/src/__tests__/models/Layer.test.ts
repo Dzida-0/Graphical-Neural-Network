@@ -1,4 +1,4 @@
-﻿import Layer from "./../../models/Layer";
+﻿import Layer from "../../models/network/Layer";
 
 describe("Layer class", () => {
 

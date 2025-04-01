@@ -52,7 +52,7 @@ export default function AppCore() {
             </div>
 
             {/* Page Content */}
-            <div className="flex-grow flex justify-center items-center p-6">
+            <div className="flex-grow justify-center items-center p-6">
                 {pages.map((page, index) => (
                     index === currentPageIndex && <SinglePage key={page.id} id={page.id} />
                 ))}

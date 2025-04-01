@@ -1,5 +1,5 @@
 ﻿import React, { createContext, useState, useContext } from "react";
-import Network from "../models/Network";
+import Network from "../models/network/Network";
 import { updateNetwork } from "./../api/NetworkAPI";
 
 interface NetworkContextInterface {
@@ -11,6 +11,7 @@ interface NetworkContextInterface {
     predictPoints: (inputs: number[]) => number;
     updateBias: (layerNumber: number, neuronNumber: number, newBias: number) => void;
     updateWeight: (layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) => void;
+    updateClassCount: (count: number) => void;
 }
 
 const NetworkContext = createContext<NetworkContextInterface | undefined>(undefined);
@@ -75,13 +76,22 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
         });
     }
 
+    const updateClassCount = (count: number) => {
+        setNetwork((prevNetwork) => {
+            const newNetwork = new Network();
+            Object.assign(newNetwork, prevNetwork);
+            newNetwork.updateOutputsNumber(count);
+            return newNetwork;
+        });
+    }
+
     const predictPoints = (inputs: number[]) => {
         const outputs = network.predict(inputs);
         return outputs.indexOf(Math.max(...outputs));
     };
 
     return (
-        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight }}>
+        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight, updateClassCount }}>
             {children}
         </NetworkContext.Provider>
     );

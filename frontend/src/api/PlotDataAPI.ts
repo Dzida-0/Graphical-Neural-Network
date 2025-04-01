@@ -1,6 +1,6 @@
 ﻿const API_URL = "http://localhost:5001";
 
-import PlotData from "./../models/PlotData";
+import PlotData from "../models/data/PlotData";
 
 export const PlotAPI = async (task: string, pageKey: number, method: string): Promise<PlotData> => {
     try {

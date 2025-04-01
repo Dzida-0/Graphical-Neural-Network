@@ -1,5 +1,5 @@
-﻿import Network from "./../../models/Network";
-import Point from "./../../models/Point";
+﻿import Network from "../../models/network/Network";
+import Point from "../../models/data/Point";
 
 test("Network should return consistent outputs", () => {
     const network = new Network();

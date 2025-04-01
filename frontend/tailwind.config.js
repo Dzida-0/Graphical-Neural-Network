@@ -6,7 +6,16 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-  	extend: {
+      extend: {
+          animation: {
+              dash: "dashAnimation 0.6s linear forwards",
+          },
+          keyframes: {
+              dashAnimation: {
+                  from: { strokeDashoffset: "var(--line-length, 16)" },
+                  to: { strokeDashoffset: "0" },
+              },
+          },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

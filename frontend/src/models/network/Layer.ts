@@ -7,7 +7,7 @@ export default class Layer {
     weights: number[][];
     //
 
-    constructor(neurons: number, prevLayerneurons: number, baiesesList?: number[], weightsList?: number[][] ) {
+    constructor(neurons: number, prevLayerneurons: number, baiesesList?: number[], weightsList?: number[][]) {
         this.neuronsNumber = neurons;
         this.prevLayerNeuronsNumber = prevLayerneurons;
         this.biases = baiesesList ?? new Array(this.neuronsNumber).fill(0);

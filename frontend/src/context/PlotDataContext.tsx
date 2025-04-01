@@ -1,10 +1,10 @@
 ﻿import React, { createContext, useState, useContext } from "react";
-import PlotData from "../models/PlotData";
+import PlotData from "../models/data/PlotData";
 import { PlotAPI } from "./../api/PlotDataAPI";
 
 interface PlotDataContextInterface {
     plotData: PlotData;
-    generateData: () => void;
+    generateData: (patern: number) => void;
 }
 
 const PlotDataContext = createContext<PlotDataContextInterface | undefined>(undefined);
@@ -12,10 +12,10 @@ const PlotDataContext = createContext<PlotDataContextInterface | undefined>(unde
 export const PlotDataProvider: React.FC<{ children: React.ReactNode; pageId: number }> = ({ children, pageId }) => {
     const [plotData, setPlotData] = useState(new PlotData());
 
-    const generateData = async () => {
+    const generateData = async (patern: number) => {
      
-
         try {
+            if(patern == 100000) return;
             const newData = await PlotAPI("generate", pageId, "POST");
             
 

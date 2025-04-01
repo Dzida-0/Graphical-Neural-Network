@@ -1,5 +1,5 @@
-﻿import Point from "./Point";
-import Network from "./Network";
+﻿import Point from "./data/Point";
+import Network from "./network/Network";
 
 export default async function NetworkLearning(epochs: number, learningRate: number, points: Point[], network: Network,
     updateMetrics: (accuracy: number, cost: number) => void) {

@@ -1,7 +1,7 @@
 ﻿import { useRef, useEffect } from "react";
 import { useNetwork } from "./../context/NetworkContext";
 import { usePlotData } from "./../context/PlotDataContext";
-import Point from "./../models/Point";
+import Point from "../models/data/Point";
 
 export default function Plot() {
     const { network, predictPoints } = useNetwork();
