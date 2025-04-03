@@ -1,15 +1,21 @@
 ﻿
 export default class TreeNode {
-    next: TreeNode | null;
-    value: number | null;
+    next: Map<string, TreeNode>;
+    value: string | null;
+    key: string;
 
-    constructor() {
-        this.next = null;
-        this.value = null;
-    }
+    constructor(value: string | null, key: string ) {
+        this.key = key;
+        this.value = value;
+        this.next = new Map();
+    };
 
-    removePrevEndNode() {
-        if (this.value == null) return;
-        this.value -= 1;
-    }
-}
+    setChild(child: TreeNode) {
+        this.next.set(child.key, child);
+    };
+
+    removeChild(child: TreeNode) {
+        this.next.delete(child.key);
+    };
+
+};

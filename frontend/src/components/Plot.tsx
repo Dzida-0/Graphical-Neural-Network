@@ -1,4 +1,4 @@
-﻿import { useRef, useEffect } from "react";
+﻿import { useRef, useEffect, useState } from "react";
 import { useNetwork } from "./../context/NetworkContext";
 import { usePlotData } from "./../context/PlotDataContext";
 import Point from "../models/data/Point";
@@ -7,6 +7,8 @@ export default function Plot() {
     const { network, predictPoints } = useNetwork();
     const { plotData, generateData } = usePlotData();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [editMode, changeEditMode] = useState(true);
+    const editCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -44,11 +46,16 @@ export default function Plot() {
     return (
         <div>
             <button
-                onClick={() => generateData()}
+                onClick={() => generateData(1)}
                 className="bg-blue-500 text-white px-4 py-2 rounded">
                 Generate
-            </button>
-            <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
+            </button>                                                                                               
+            {editMode ?
+                <canvas ref={editCanvasRef} width={600} height={600} className="bg-gray-100" />
+            :
+                <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
+            }
+            
         </div>
     );
 }

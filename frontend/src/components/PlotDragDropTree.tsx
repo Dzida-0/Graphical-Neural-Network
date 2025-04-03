@@ -1,48 +1,79 @@
-﻿import { useState } from "react";
-import { JSX } from "react/jsx-runtime";
-import Tree from "./../models/data/Tree"
+﻿import { JSX } from "react/jsx-runtime";
+import { usePlotData } from "./../context/PlotDataContext";
+import TreeNode from "./../models/data/TreeNode";
 
 export default function PlotDragDropTree() {
-    const [tree] = useState({
-        n0: {
-            n0: { e0: "A", e1: "B" },
-            e1: "C",
-        },
-    });
+    const { classTreeData, addNode, removeNode } = usePlotData(); // Get addNode function
 
-    const renderTree = (node: any, key: string, isRoot = false): JSX.Element => {
-        if (typeof node === "string") {
+    // Handle dragging the spawner
+    const handleDragStart = (event: React.DragEvent<HTMLDivElement>, nodeKey: string) => {
+        event.dataTransfer.setData("nodeKey", nodeKey);
+    };
+
+    // Handle dropping on a tree node
+    const handleDrop = (event: React.DragEvent<HTMLDivElement>, targetKey: string) => {
+        event.preventDefault();
+        const draggedKey = event.dataTransfer.getData("nodeKey");
+
+        if (draggedKey == "spawn") {
+            addNode(targetKey); 
+        }
+        else if (draggedKey == "delete") {
+            removeNode(targetKey); 
+        }
+    };
+
+    // Prevent default drag-over behavior to allow dropping
+    const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+    };
+
+    const renderTree = (node: TreeNode): JSX.Element => {
+        
+       
+        if (node.value != null) {
+           
             return (
-                <div key={key} className="relative flex flex-col items-center">
-                    <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center">
-                        {key + ": " + node}
+                
+                <div
+                    //key={node.key}
+                    className="relative flex flex-col items-center"
+                    onDragOver={handleDragOver}
+                    onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
+                >
+                    <div
+                        className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center"
+                        draggable={true}
+                        key={`t-&=${node.key}`}
+                    >
+                        {node.value}
                     </div>
                 </div>
             );
         }
 
-        const children = Object.entries(node);
-
         return (
-            <div key={key} className="relative flex flex-col items-center">
-                {!isRoot && (
-                    <div className="relative w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center">
-                        {key + ": " + Object.keys(node).join(", ")}
-                        {children.length > 0 && (
-                            <div className="absolute bottom-[-10px] left-1/2 w-0.5 h-4 bg-gray-600"></div>
-                        )}
-                    </div>
-                )}
-                {children.length > 0 && (
-                    <div className="relative flex space-x-4 mt-2">
-                        {children.map(([childKey, childValue]) => (
-                            <div key={childKey} className="relative flex flex-col items-center">
-                                <div className="absolute top-[-10px] left-1/2 w-0.5 h-4 bg-gray-600"></div>
-                                {renderTree(childValue, childKey)}
-                            </div>
-                        ))}
-                    </div>
-                )}
+            <div
+                //key={`t-&=${node.key}`}
+                
+                className="relative flex flex-col gap-10 items-center"
+                
+            >
+                <div className="relative w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center"
+                    onDragOver={handleDragOver}
+                    onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
+                    key={`t-&=${node.key}`}
+                >
+                 
+                </div>
+                <div className="relative flex space-x-4 mt-2">
+                    {Array.from(node.next.values()).map((nextNode: TreeNode) => (
+                        <div className="relative flex flex-col items-center">
+                     
+                            {renderTree(nextNode)}
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     };
@@ -50,7 +81,24 @@ export default function PlotDragDropTree() {
     return (
         <div className="p-4 bg-gray-100 min-h-screen flex flex-col items-center space-y-6">
             <h2 className="text-lg font-bold mb-4">Tree Structure</h2>
-            {renderTree(tree, "n0", true)}
+            <div>
+                Spawner
+                <div
+                    className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center cursor-pointer"
+                    draggable={true}
+                    onDragStart={(event) => handleDragStart(event, "spawn")} // Start drag with "spawner"
+                />
+            </div>
+            <div>
+                Delete
+                <div
+                    className="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center cursor-pointer"
+                    draggable={true}
+                    onDragStart={(event) => handleDragStart(event, "delete")} // Start drag with "spawner"
+                />
+            </div>
+            {
+                renderTree(classTreeData.root)}
         </div>
     );
 }
