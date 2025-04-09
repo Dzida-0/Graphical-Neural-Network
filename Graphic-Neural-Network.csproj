@@ -8,6 +8,7 @@
     <UserSecretsId>53527ca9-4581-4dca-bf8c-e8bbf5ee7ac7</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <TypeScriptModuleKind>none</TypeScriptModuleKind>
   </PropertyGroup>
 
   <ItemGroup>

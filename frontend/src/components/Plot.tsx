@@ -1,13 +1,15 @@
-﻿import { useRef, useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useNetwork } from "./../context/NetworkContext";
 import { usePlotData } from "./../context/PlotDataContext";
-import Point from "../models/data/Point";
+import Point from "./../models/data/Point";
+
+import CanvasShapes from "./e";
 
 export default function Plot() {
     const { network, predictPoints } = useNetwork();
     const { plotData, generateData } = usePlotData();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [editMode, changeEditMode] = useState(true);
+    const [editMode] = useState(true);
     const editCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
@@ -55,7 +57,7 @@ export default function Plot() {
             :
                 <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
             }
-            
+            <CanvasShapes />
         </div>
     );
 }

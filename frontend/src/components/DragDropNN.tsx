@@ -69,7 +69,7 @@ export default function DragDropNN() {
         updateNeuronPositions();
         window.addEventListener("resize", updateNeuronPositions);
         return () => window.removeEventListener("resize", updateNeuronPositions);
-    }, [network]); // Re-run when the network changes
+    }, [network]); // Re-run when the network changes or window is resized
 
     const [animatedLines, setAnimatedLines] = useState(new Set());
 

@@ -1,0 +1,11 @@
+﻿@startuml
+
+package models{
+
+	class Tree{
+	}
+
+	class TreeNode{
+	}
+}
+@enduml
