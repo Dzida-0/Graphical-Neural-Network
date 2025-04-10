@@ -2,14 +2,19 @@
 import { usePlotData } from "./../context/PlotDataContext";
 import TreeNode from "./../models/data/TreeNode";
 import { useState, useEffect, useRef } from "react";
+import NodeDividerSettings from "./NodeDividerSettings";
+import EndTreeNode from "../models/data/EndTreeNode";
+import MiddleTreeNode from "../models/data/MiddleTreeNode";
 
 export default function PlotDragDropTree() {
-    const { classTreeData, addNode, removeNode } = usePlotData(); // Get addNode function
+    const { classTreeData, addNode, removeNode,classesColors } = usePlotData(); // Get addNode function
     const [sideWindowShow, setSideWindowShow] = useState<number>(0);
     const [selectedNodeKey, setSelectedNodeKey] = useState<string | null>(null);
     const [treeRenderTrigger, setTreeRenderTrigger] = useState<number>(0);
     const [nodePositions, setNodePositions] = useState<{ [key: string]: { x: number; y: number } }>({});
     const nodeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const sideWindowRef = useRef<HTMLDivElement>(null);
+
 
     useEffect(() => {
         const observer = new ResizeObserver(() => {
@@ -24,17 +29,22 @@ export default function PlotDragDropTree() {
     }, [classTreeData]);
 
     useEffect(() => {
-        const handleClickOutside = () => {
-
-
-
-            setSelectedNodeKey(null);
-            setSideWindowShow(0);
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                sideWindowRef.current &&
+                !sideWindowRef.current.contains(event.target as Node)
+            ) {
+                setSelectedNodeKey(null);
+                setSideWindowShow(0);
+            }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
     }, []);
+
 
 
     useEffect(() => {
@@ -71,13 +81,13 @@ export default function PlotDragDropTree() {
             const startPos = nodePositions[node.key];
             if (!startPos) return; 
             const { x: startX, y: startY } = nodePositions[node.key];
-            node.next.forEach((bellowNode) => {
+            (node as MiddleTreeNode).next.forEach((bellowNode) => {
 
                 const endPos = nodePositions[bellowNode.key];
                 if (!endPos) return; 
                 const { x: endX, y: endY } = nodePositions[bellowNode.key];
                 addConnection(node.key, bellowNode.key, startX, startY, endX, endY);
-                if (bellowNode.next.size > 0) drawNode(bellowNode);
+                if (bellowNode instanceof MiddleTreeNode) drawNode(bellowNode);
             });
         }
 
@@ -87,13 +97,11 @@ export default function PlotDragDropTree() {
     };
 
     const handleMiddleNodeClick = (targetKey: string) => {
-        console.log(targetKey);
         setSelectedNodeKey(targetKey);
         setSideWindowShow(1);
     };
 
     const handleEndNodeClick = (targetKey: string) => {
-        console.log(targetKey);
         setSelectedNodeKey(targetKey);
         setSideWindowShow(2);
     };
@@ -146,20 +154,20 @@ export default function PlotDragDropTree() {
     const renderTree = (node: TreeNode): JSX.Element => {
         
        
-        if (node.value != null) {
+        if (node instanceof EndTreeNode) {
            
             return (
                 
                 <div
                     //key={node.key}
                     className="relative flex flex-col items-center"
-                    onDragOver={handleDragOver}
-                    onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
                 >
                     <div
                         className={`w-12 h-12 text-white rounded-full flex items-center justify-center 
-                        ${selectedNodeKey === node.key ? "bg-green-700" : "bg-green-500"}`}
+                        ${selectedNodeKey === node.key ? `bg-${classesColors.get(node.value)}-700` : `bg-${classesColors.get(node.value)}-500`}`}
                         draggable={true}
+                        onDragOver={handleDragOver}
+                        onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
                         key={`t-&=${node.key}`}
                         onClick={() => handleEndNodeClick(node.key)}
                         ref={(el) => {
@@ -181,8 +189,6 @@ export default function PlotDragDropTree() {
             >
                 <div className={`relative w-12 h-12 text-white rounded-full flex items-center justify-center 
                 ${selectedNodeKey === node.key ? "bg-blue-700" : "bg-blue-500"}`}
-                    onDragOver={handleDragOver}
-                    onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
                     key={`t-&=${node.key}`}
                     onClick={() => handleMiddleNodeClick(node.key)}
                     ref={(el) => {
@@ -192,7 +198,7 @@ export default function PlotDragDropTree() {
                  
                 </div>
                 <div className="relative flex space-x-4 mt-2">
-                    {Array.from(node.next.values()).map((nextNode: TreeNode) => (
+                    {Array.from((node as MiddleTreeNode).next.values()).map((nextNode: TreeNode) => (
                         <div className="relative flex flex-col items-center" key={`r-&=${nextNode.key}`}>
                             {renderTree(nextNode)}
                           
@@ -240,13 +246,14 @@ export default function PlotDragDropTree() {
             
             </div>
             {/* Side window */}
-            <div>
+            <div ref={sideWindowRef}>
                 {{
                     0: () => renderTree(classTreeData.root),
-                    1: () => renderTree(classTreeData.root),
+                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />,
                     2: () => renderTree(classTreeData.root),
                 }[sideWindowShow as 0 | 1 | 2]?.()}
             </div>
+
 
         </div>
     );

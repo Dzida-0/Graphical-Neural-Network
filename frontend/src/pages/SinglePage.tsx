@@ -4,8 +4,8 @@ import { PlotDataProvider } from "./../context/PlotDataContext";
 import Plot from "./../components/Plot";
 import SlidersNN from "./../components/SlidersNN";
 import TrainingController from "./../components/TrainingController";
-import Collapsible from "./../components/Collapsible";
-import PlotController  from "./../components/PlotController"
+import Collapsible from "./../components/Collapsible";  
+import PlotDragDropTree from "../components/PlotDragDropTree";
 
 interface SinglePageInterface {
     id: number;
@@ -26,7 +26,7 @@ export default function SinglePage({ id }: SinglePageInterface) {
                     </Collapsible>
                     <div className="flex m-10">
                     <Plot />
-                    <PlotController />
+                    <PlotDragDropTree />
                     </div>
                     <TrainingController />
 

@@ -1,13 +1,16 @@
-﻿import TreeNode from "./TreeNode"
+﻿import DataDivider from "./DataDivider";
+import EndTreeNode from "./EndTreeNode";
+import MiddleTreeNode from "./MiddleTreeNode";
+import TreeNode from "./TreeNode"
 
 export default class Tree {
     root: TreeNode;
     endNodeCount: number;
     constructor() {
-        this.endNodeCount = 0;
-        this.root = new TreeNode(null,"0");
-        this.addNode("0");
-        this.addNode("0");
+        this.endNodeCount = 2;
+        this.root = new MiddleTreeNode("0");
+        (this.root as MiddleTreeNode).setChild(new EndTreeNode("A","00"));
+        (this.root as MiddleTreeNode).setChild(new EndTreeNode("B", "01"));
     };
 
     getNodeByKey(key: string) {
@@ -16,8 +19,9 @@ export default class Tree {
         let node = this.root;
         for (let i = 1; i < key.length; i++) {
             const nextKey = key.substring(0, i + 1);
-            if (!node.next.has(nextKey)) return null;
-            node = node.next.get(nextKey)!; // ! - non-null assertion operator
+            //if (node instanceof EndTreeNode) return null;
+            if (!(node as MiddleTreeNode).next.has(nextKey)) return null;
+            node = (node as MiddleTreeNode).next.get(nextKey)!; // ! - non-null assertion operator
         }
         return node;
     };
@@ -27,46 +31,32 @@ export default class Tree {
         if (this.endNodeCount == 5) return;
         const node = this.getNodeByKey(key);
         if (node == null) return;
-        if (node.value != null) {
+        if (node instanceof EndTreeNode) {
             const aboveNode = this.getNodeByKey(key.substring(0, key.length-1))!;
-            const newNode = new TreeNode(null, key);
-            newNode.setChild(new TreeNode(node.value, key + "0"));
-            newNode.setChild(new TreeNode("ABCDE"[this.endNodeCount], key + "1"));
-            aboveNode.setChild(newNode);
-
-
+            const newNode = new MiddleTreeNode(key);
+            newNode.setChild(new EndTreeNode((node as EndTreeNode).value, key + "0"));
+            newNode.setChild(new EndTreeNode("ABCDE"[this.endNodeCount], key + "1"));
+            (aboveNode as MiddleTreeNode).setChild(newNode);
+            this.endNodeCount++;
         }
-        else {
-            const newKey = key + node.next.size;
-            const newNode = new TreeNode("ABCDE"[this.endNodeCount], newKey);
-            
-            node.setChild(newNode);
 
-        
-        }
-    
-        this.endNodeCount++;
     };
 
     removeNode(key: string) {
         if (this.endNodeCount == 2) return;
         const node = this.getNodeByKey(key);
         if (node == null) return;
-        if (node.value == null) return;
+        if (node instanceof MiddleTreeNode) return;
 
         const aboveNode = this.getNodeByKey(key.substring(0, key.length - 1))!;
-        aboveNode.removeChild(this.getNodeByKey(key)!);
-        if (aboveNode.next.size == 1) {
-            const aboveAboveNode = this.getNodeByKey(key.substring(0, key.length - 2))!;
-            aboveAboveNode.setChild(new TreeNode(this.getNodeByKey(aboveNode+"0")!.value,aboveNode.key))
-        }
+        (aboveNode as MiddleTreeNode).removeChild(this.getNodeByKey(key)!);
+        const aboveAboveNode = this.getNodeByKey(key.substring(0, key.length - 2))!;
+        (aboveAboveNode as MiddleTreeNode).setChild(new EndTreeNode((this.getNodeByKey(aboveNode + "0") as EndTreeNode)!.value, aboveNode.key))
         this.endNodeCount--;
     };
 
-    moveNode(from: string, to: string){
-        const nodeFrom = this.getNodeByKey(from);
-        if (nodeFrom == null) return;
-        const nodeTo = this.getNodeByKey(to);
-        if (nodeTo == null) return;
-    };
+    changeDivider(key: string, divider: DataDivider) {
+        (this.getNodeByKey(key) as MiddleTreeNode).divider = divider;
+    }
+
 }

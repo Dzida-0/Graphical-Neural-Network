@@ -1,24 +1,84 @@
-﻿import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef } from "react";
 import { useNetwork } from "./../context/NetworkContext";
 import { usePlotData } from "./../context/PlotDataContext";
 import Point from "./../models/data/Point";
+import TreeNode from "./../models/data/TreeNode";
+import EndTreeNode from "../models/data/EndTreeNode";
+import MiddleTreeNode from "../models/data/MiddleTreeNode";
 
-import CanvasShapes from "./e";
 
 export default function Plot() {
     const { network, predictPoints } = useNetwork();
-    const { plotData, generateData } = usePlotData();
+    const { plotData,classTreeData, generateData, dataGenerated,classesColors } = usePlotData();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [editMode] = useState(true);
-    const editCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
+        if (dataGenerated) {
+            renderWithData(ctx, canvas);
+        } else {
+            renderWithoutData(ctx, canvas);
+        }
+    }, [network, plotData, dataGenerated, classTreeData]);
+
+    const renderWithoutData = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+
+        const renderSegment = (node: TreeNode) => {
+            const colorMap: string[][] = [];
+            if (node instanceof EndTreeNode) {
+                for (let x = 0; x < width; x++) {
+                    colorMap[x] = [];
+                    for (let y = 0; y < height; y++) {
+                        colorMap[x][y] = (node as EndTreeNode).value;
+                    }
+                }
+                return colorMap;
+            }
+            const child1 = (node as MiddleTreeNode).next?.get(node.key + "0");
+            const child2 = (node as MiddleTreeNode).next?.get(node.key + "1");
+
+            if (!child1 || !child2) return [];
+            const map1 = renderSegment(child1);
+            const map2 = renderSegment(child2);
+
+            for (let x = 0; x < width; x++) {
+                colorMap[x] = []
+                for (let y = 0; y < height; y++) {
+
+                    if ((node as MiddleTreeNode).divider.evaluate(x - width/2, y - height /2)) {
+                        colorMap[x][y] = map1[x][y];
+                    }
+                    else {
+                        colorMap[x][y] = map2[x][y];
+                    }
+                }
+            }
+            return colorMap;
+        };
+
+        const colorMap = renderSegment(classTreeData.root);
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                const color = classesColors.get(colorMap[x][y]);
+                ctx.fillStyle = color!;
+                ctx.fillRect(x, y, 1, 1);
+            }
+        }
+        
+        
+
+
+    }
+
+    const renderWithData = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
         const size = canvas.width;
         ctx.clearRect(0, 0, size, size);
 
@@ -28,8 +88,8 @@ export default function Plot() {
             for (let y = 0; y < size; y += resolution) {
                 const normX = (x / size) * 2 - 1;
                 const normY = (y / size) * 2 - 1;
-                const predictedClass = predictPoints([normX * 100, normY * 100 ]); 
-                ctx.fillStyle = predictedClass === 0 ? "rgba(173, 216, 230, 0.5)" : "rgba(255, 182, 193, 0.5)"; 
+                const predictedClass = predictPoints([normX * 100, normY * 100]);
+                ctx.fillStyle = predictedClass === 0 ? "rgba(173, 216, 230, 0.5)" : "rgba(255, 182, 193, 0.5)";
                 ctx.fillRect(x, y, resolution, resolution);
             }
         }
@@ -42,22 +102,16 @@ export default function Plot() {
             ctx.fill();
             ctx.stroke();
         });
-
-    }, [network, plotData]);
+    }
 
     return (
         <div>
             <button
-                onClick={() => generateData(1)}
+                onClick={() => generateData()}
                 className="bg-blue-500 text-white px-4 py-2 rounded">
                 Generate
             </button>                                                                                               
-            {editMode ?
-                <canvas ref={editCanvasRef} width={600} height={600} className="bg-gray-100" />
-            :
-                <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
-            }
-            <CanvasShapes />
+            <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
         </div>
     );
 }
