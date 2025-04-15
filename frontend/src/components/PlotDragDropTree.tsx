@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import NodeDividerSettings from "./NodeDividerSettings";
 import EndTreeNode from "../models/data/EndTreeNode";
 import MiddleTreeNode from "../models/data/MiddleTreeNode";
+import TrainingController from "./TrainingController";
 
 export default function PlotDragDropTree() {
     const { classTreeData, addNode, removeNode,classesColors } = usePlotData(); // Get addNode function
@@ -210,8 +211,18 @@ export default function PlotDragDropTree() {
     };
 
     return (
-        <div>
-            <div className="p-4 bg-gray-100 min-h-screen flex flex-col items-center space-y-6">
+        <div className="flex p-2 border rounded-2xl shadow-md p-4 bg-gray-100">  
+            {/* Side window */}
+            <div className="p-4 bg-gray-100  w-1/2 flex flex-col items-center space-y-6" ref={sideWindowRef}>
+                {{
+                    0: () => <TrainingController />,
+                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />,
+                    2: () => renderTree(classTreeData.root),
+                }[sideWindowShow as 0 | 1 | 2]?.()}
+            </div>
+
+            {/* Tree */}
+            <div className="p-6 bg-gray-200 rounded-2xl shadow-md flex flex-col items-center space-y-6">
                 <h2 className="text-lg font-bold mb-4">Tree Structure</h2>
                 <div>
                     Spawner
@@ -239,22 +250,10 @@ export default function PlotDragDropTree() {
                     {/* Nodes */}
                     <div className="relative">
                         {renderTree(classTreeData.root)}
-                    </div>
-                    
-                   
-                    </div>
-            
+                    </div>          
+                </div>
             </div>
-            {/* Side window */}
-            <div ref={sideWindowRef}>
-                {{
-                    0: () => renderTree(classTreeData.root),
-                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />,
-                    2: () => renderTree(classTreeData.root),
-                }[sideWindowShow as 0 | 1 | 2]?.()}
-            </div>
-
-
+        
         </div>
     );
 }

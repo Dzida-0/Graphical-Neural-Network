@@ -1,6 +1,7 @@
-﻿import React, { createContext, useState, useContext } from "react";
+﻿import React, { createContext, useState, useContext, useEffect } from "react";
 import Network from "../models/network/Network";
-import { updateNetwork } from "./../api/NetworkAPI";
+import { updateNetwork, getNetwork } from "./../api/NetworkAPI";
+import Layer from "../models/network/Layer";
 
 interface NetworkContextInterface {
     network: Network;
@@ -12,12 +13,41 @@ interface NetworkContextInterface {
     updateBias: (layerNumber: number, neuronNumber: number, newBias: number) => void;
     updateWeight: (layerNumber: number, neuronNumber: number, inputNumber: number, newWeight: number) => void;
     updateClassCount: (count: number) => void;
+    collapsed: { [key: string]: boolean };
+    updateCollapsed: (key: string, value: boolean) => void;
 }
 
 const NetworkContext = createContext<NetworkContextInterface | undefined>(undefined);
 
 export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: number }> = ({ children, pageId }) => {
-    const [network, setNetwork] = useState(new Network());
+    const [network, setNetwork] = useState<Network>(new Network());
+
+    const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({
+        Network: false,
+        Sliders: false,
+    });
+
+    useEffect(() => {
+        const fetchNetwork = async () => {
+            const fetched = await getNetwork(pageId);
+            if (fetched) {
+                const loaded = new Network();
+                Object.assign(loaded, fetched);
+
+                // Reconstruct each Layer from plain object to real class instance
+                loaded.layers = fetched.layers.map((layerData: any) => {
+                    const layer = new Layer(layerData.neuronsNumber, layerData.prevLayerNeuronsNumber);
+                    layer.biases = [...layerData.biases];
+                    layer.weights = layerData.weights.map((w: number[]) => [...w]);
+                    return layer;
+                });
+
+                setNetwork(loaded);
+            }
+        };
+        fetchNetwork();
+    }, [pageId]);
+
 
     const addNeuron = (layerIndex: number) => {
         
@@ -25,7 +55,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network(); 
             Object.assign(newNetwork, prevNetwork); 
             newNetwork.addNode(layerIndex); 
-            updateNetwork("addNeuron", pageId, 1);
+            updateNetwork("addN", pageId, { layerIndex:layerIndex });
             return newNetwork; 
         });
 
@@ -36,8 +66,17 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork); 
             newNetwork.removeNode(layerIndex, neuronIndex);
+            console.log("Sending RemN request", {
+                PageId: pageId,
+                Data: {
+                    layerIndex,
+                    neuronIndex,
+                },
+            });
+            
             return newNetwork; 
         });
+        updateNetwork("RemN", pageId, { layerIndex: layerIndex, neuronIndex: neuronIndex });
     };
 
     const addLayer = (index: number) => {
@@ -45,6 +84,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork); 
             newNetwork.addLayer(index);
+            updateNetwork("addL", pageId, { index: index });
             return newNetwork; 
         });
     };
@@ -54,6 +94,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork); 
             newNetwork.removeLayer(index);
+            updateNetwork("RemL", pageId, { index: index });
             return newNetwork; 
         });
     };
@@ -63,6 +104,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork);
             newNetwork.updateBaies(layerNumber, neuronNumber, newBias);
+            updateNetwork("UpdB", pageId, { layerNumber: layerNumber, neuronNumber: neuronNumber, newBias: newBias });
             return newNetwork;
         });
     }
@@ -72,6 +114,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork);
             newNetwork.updateWeight(layerNumber, neuronNumber, inputNumber, newWeight);
+            updateNetwork("UpdW", pageId, { layerNumber: layerNumber, neuronNumber: neuronNumber, inputNumber: inputNumber, newWeight: newWeight });
             return newNetwork;
         });
     }
@@ -81,6 +124,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork);
             newNetwork.updateOutputsNumber(count);
+            updateNetwork("UpdCC", pageId, { count: count });
             return newNetwork;
         });
     }
@@ -90,8 +134,17 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
         return outputs.indexOf(Math.max(...outputs));
     };
 
+    const updateCollapsed = (key: string, value: boolean) => {
+        setCollapsed((prevCollapsed) => {
+            const newCollapsed = { ...prevCollapsed };
+            newCollapsed[key] = value; 
+            updateNetwork("UpdCol", pageId, { key: "Network", value: value });
+            return newCollapsed;
+        });
+    };
+
     return (
-        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight, updateClassCount }}>
+        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight, updateClassCount, collapsed, updateCollapsed }}>
             {children}
         </NetworkContext.Provider>
     );

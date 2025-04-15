@@ -7,7 +7,7 @@ export default function NodeDividerSettings({ dividerKey }: { dividerKey: string
     const [selected, setSelected] = useState<string>("");
     const { changeDivider } = usePlotData();
     return (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 rounded-2xl shadow-md bg-gray-200 ">
             {/* Inline buttons */}
             <div className="flex space-x-2">
                 {["ax+b", "sin(x)", "x^2", "x^3", "ver"].map((label) => (

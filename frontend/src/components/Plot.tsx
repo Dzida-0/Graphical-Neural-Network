@@ -105,13 +105,8 @@ export default function Plot() {
     }
 
     return (
-        <div>
-            <button
-                onClick={() => generateData()}
-                className="bg-blue-500 text-white px-4 py-2 rounded">
-                Generate
-            </button>                                                                                               
-            <canvas ref={canvasRef} width={600} height={600} className="bg-gray-100" />
+        <div className= "border rounded-2xl shadow-md p-4 bg-gray-100">                                                                                             
+            <canvas ref={canvasRef} width={700} height={700} className="bg-white-100" />
         </div>
     );
 }

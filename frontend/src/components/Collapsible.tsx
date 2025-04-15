@@ -1,18 +1,18 @@
-﻿import { useState } from "react";
-import { Button } from "./collapsibleLib/button";
+﻿import { Button } from "./collapsibleLib/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNetwork } from "../context/NetworkContext";
 
 export default function Collapsible({ title, children }: { title: string; children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(true);
+    const { collapsed, updateCollapsed} = useNetwork();
 
     return (
         <div className="border rounded-2xl shadow-md p-4 bg-white w-full">
-            <Button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between">
+            <Button onClick={() => updateCollapsed(title,!collapsed[title])} className="w-full flex justify-between">
                 {title}
-                <span>{isOpen ? "▲" : "▼"}</span>
+                <span>{!collapsed[title] ? "▲" : "▼"}</span>
             </Button>
             <AnimatePresence>
-                {isOpen && (
+                {!collapsed[title] && (
                     <motion.div
                         initial={{ opacity: 1, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}

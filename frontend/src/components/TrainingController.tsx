@@ -72,7 +72,13 @@ export default function TrainingController() {
                     className="w-20 border p-1 rounded"
                 />
             </label>
-
+            {/* Buttons 
+            <button
+                onClick={() => generateData()}
+                className="bg-blue-500 text-white px-4 py-2 rounded">
+                Generate
+            </button>  
+            */}
             {/* Buttons */}
             <div className="flex gap-2">
                 <button

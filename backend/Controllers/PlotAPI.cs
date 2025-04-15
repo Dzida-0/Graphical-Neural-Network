@@ -10,7 +10,7 @@ namespace Graphic_Neural_Network.backend.Controlers
     }
 
     [ApiController]
-    [Route("api/plot")]
+    [Route("plot")]
     public class PlotAPI : ControllerBase
     {
         private Dictionary<int, PlotData> _data = new Dictionary<int, PlotData>();

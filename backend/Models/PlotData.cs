@@ -21,22 +21,22 @@
 
         public void GenerateLinearPoints()
         {
-            double a = random.NextDouble() * 2 - 1;
-            double b = random.NextDouble() - 0.5;
+            double a = _numberGenerator.genarate(-1,1);
+            double b = _numberGenerator.genarate(-0.5,0.5);
             double y, x;
             int pointClass;
             for (int i = 0; i < ElementCount; i++)
             {
-                x = random.NextDouble() * 2 - 1;
-                if (random.NextDouble() < 0.5)
+                x = _numberGenerator.genarate(-1, 1);
+                if (_numberGenerator.genarate(-0.5, 0.5) < 0.5)
                 {
                     pointClass = 0;
-                    y = random.NextDouble() * (a * x + b + 1) - 1;
+                    y = _numberGenerator.genarate( - 1, a * x + b);
                 }
                 else
                 {
                     pointClass = 1;
-                    y = random.NextDouble() * (1 - a * x + b) + a * x + b;
+                    y = _numberGenerator.genarate(a * x + b, 1);
                 }
                 Points[i] = new Point(i, x *100, y * 100, pointClass);
             }
