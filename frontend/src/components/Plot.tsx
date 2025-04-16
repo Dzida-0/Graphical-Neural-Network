@@ -31,52 +31,54 @@ export default function Plot() {
 
         ctx.clearRect(0, 0, width, height);
 
-        const renderSegment = (node: TreeNode) => {
-            const colorMap: string[][] = [];
+        // Logical coordinate system
+        const minX = -10;
+        const maxX = 10;
+        const minY = -10;
+        const maxY = 10;
+        const resolution = 200;
+
+        // Grid cell size in pixels
+        const cellWidth = width / resolution;
+        const cellHeight = height / resolution;
+
+        // Coordinate mapping
+        const toCanvasX = (x: number) => ((x - minX) / (maxX - minX)) * width;
+        const toCanvasY = (y: number) => ((y - minY) / (maxY - minY)) * height;
+
+        // Tree evaluation
+        const evaluateClassAt = (x: number, y: number, node: TreeNode): string => {
             if (node instanceof EndTreeNode) {
-                for (let x = 0; x < width; x++) {
-                    colorMap[x] = [];
-                    for (let y = 0; y < height; y++) {
-                        colorMap[x][y] = (node as EndTreeNode).value;
-                    }
-                }
-                return colorMap;
+                return node.value;
             }
-            const child1 = (node as MiddleTreeNode).next?.get(node.key + "0");
-            const child2 = (node as MiddleTreeNode).next?.get(node.key + "1");
 
-            if (!child1 || !child2) return [];
-            const map1 = renderSegment(child1);
-            const map2 = renderSegment(child2);
+            const middle = node as MiddleTreeNode;
+            const result = middle.divider.evaluate(x, y);
+            const nextKey = middle.key + (result ? "0" : "1");
+            const next = middle.next?.get(nextKey);
 
-            for (let x = 0; x < width; x++) {
-                colorMap[x] = []
-                for (let y = 0; y < height; y++) {
-
-                    if ((node as MiddleTreeNode).divider.evaluate(x - width/2, y - height /2)) {
-                        colorMap[x][y] = map1[x][y];
-                    }
-                    else {
-                        colorMap[x][y] = map2[x][y];
-                    }
-                }
-            }
-            return colorMap;
+            if (!next) return "";
+            return evaluateClassAt(x, y, next);
         };
 
-        const colorMap = renderSegment(classTreeData.root);
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                const color = classesColors.get(colorMap[x][y]);
-                ctx.fillStyle = color!;
-                ctx.fillRect(x, y, 1, 1);
+        // Render grid
+        for (let i = 0; i < resolution; i++) {
+            const x = minX + ((maxX - minX) * i) / (resolution - 1);
+            for (let j = 0; j < resolution; j++) {
+                const y = minY + ((maxY - minY) * j) / (resolution - 1);
+
+                const classId = evaluateClassAt(x, y, classTreeData.root);
+                const color = classesColors.get(classId);
+                if (!color) continue;
+
+                ctx.fillStyle = color;
+
+                const px = Math.floor(toCanvasX(x));
+                const py = Math.floor(toCanvasY(y));
+                ctx.fillRect(px, py, Math.ceil(cellWidth), Math.ceil(cellHeight));
             }
         }
-        
-        
-
-
-    }
+    };
 
     const renderWithData = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
         const size = canvas.width;

@@ -14,6 +14,7 @@ interface PlotDataContextInterface {
     addNode: (key: string) => void;
     removeNode: (key: string) => void;
     changeDivider: (key: string, divider: DataDivider) => void;
+    getDivider: (key: string) => DataDivider;
   //  moveNode: (from: string, to: string) => void;
     dataGenerated: boolean;
     classesColors: Map<string, string>;
@@ -80,8 +81,12 @@ export const PlotDataProvider: React.FC<{ children: React.ReactNode; pageId: num
         setDataGenerated(false);
     }
 
+    const getDivider = (key: string) => {
+        return classTreeData.getDivider(key);
+    }
+
     return (
-        <PlotDataContext.Provider value={{ plotData, generateData, classTreeData, addNode, removeNode, changeDivider, dataGenerated, classesColors }}>
+        <PlotDataContext.Provider value={{ plotData, generateData, classTreeData, addNode, removeNode, changeDivider, getDivider, dataGenerated, classesColors }}>
             {children}
         </PlotDataContext.Provider>
     );

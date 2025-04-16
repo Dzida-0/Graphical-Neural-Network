@@ -170,7 +170,7 @@ export default function DragDropNN() {
 
 
     return (
-        <div className="relative flex flex-col bg-gray-100 w-full " style={{
+        <div className="relative flex flex-col bg-gray-100 w-full overflow-x-auto" style={{
             minHeight: `${Math.max(500, maxNeurons * 40) + 150}px`
         }}>
             {/* Controls */}

@@ -56,7 +56,11 @@ export default class Tree {
     };
 
     changeDivider(key: string, divider: DataDivider) {
-        (this.getNodeByKey(key) as MiddleTreeNode).divider = divider;
+        (this.getNodeByKey(key) as MiddleTreeNode).setDivider(divider);
+    }
+
+    getDivider(key: string) {
+        return (this.getNodeByKey(key) as MiddleTreeNode).divider;
     }
 
 }

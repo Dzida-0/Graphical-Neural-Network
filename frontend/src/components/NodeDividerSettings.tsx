@@ -1,11 +1,54 @@
-﻿import { useState } from "react";
-import LinearSettings from "./LinearSettings"
-import DataDivider from "../models/data/DataDivider";
+﻿import { useState, useEffect } from "react";
 import { usePlotData } from "../context/PlotDataContext";
+//
+import SinSettings from "./SinSettings";
+import LinearSettings from "./LinearSettings"
+import SqueredSettings from "./SqueredSettings"
+import CubedSettings from "./CubedSettings"
+import VerdicalSettings from "./VerdicalSettings"
+//
+import LinearDivider from "../models/data/LinearDivider";
+import SinDivider from "../models/data/SinDivider";
+import SquaredDivider from "../models/data/SqueredDivider";
+import CubedDivider from "../models/data/CubedDivider";
+import VerdicalDivider from "../models/data/VerdicalDivider";
 
 export default function NodeDividerSettings({ dividerKey }: { dividerKey: string }) {
+    const { changeDivider, getDivider } = usePlotData();
     const [selected, setSelected] = useState<string>("");
-    const { changeDivider } = usePlotData();
+
+    useEffect(() => {
+        const divider = getDivider(dividerKey);
+
+        if (divider instanceof LinearDivider) setSelected("ax+b");
+        else if (divider instanceof SinDivider) setSelected("sin(x)");
+        else if (divider instanceof SquaredDivider) setSelected("x^2");
+        else if (divider instanceof CubedDivider) setSelected("x^3");
+        else if (divider instanceof VerdicalDivider) setSelected("ver");
+    }, [dividerKey, getDivider]);
+    
+
+    const changeDividerClass = (label : string) => {
+        setSelected(label);
+        switch (label) {
+            case "ax+b":
+                changeDivider(dividerKey, new LinearDivider());
+                break;
+            case "sin(x)":
+                changeDivider(dividerKey, new SinDivider());
+                break;
+            case "x^2":
+                changeDivider(dividerKey, new SquaredDivider());
+                break;
+            case "x^3":
+                changeDivider(dividerKey, new CubedDivider());
+                break;
+            case "ver":
+                changeDivider(dividerKey, new VerdicalDivider());
+                break;
+        }
+    }
+
     return (
         <div className="p-4 space-y-4 rounded-2xl shadow-md bg-gray-200 ">
             {/* Inline buttons */}
@@ -22,7 +65,7 @@ export default function NodeDividerSettings({ dividerKey }: { dividerKey: string
                             value={label}
                             className="hidden"
                             checked={selected === label}
-                            onChange={() => setSelected(label)}
+                            onChange={() => changeDividerClass(label)}
                         />
                         {label}
                     </label>
@@ -37,16 +80,16 @@ export default function NodeDividerSettings({ dividerKey }: { dividerKey: string
                     
                 )}
                 {selected === "sin(x)" && (
-                    <LinearSettings dividerKey={dividerKey} />// <SinSettings />
+                    <SinSettings dividerKey={dividerKey} />// <SinSettings />
                 )}
                 {selected === "x^2" && (
-                    <LinearSettings dividerKey={dividerKey} />// <QuadraticSettings />
+                    <SqueredSettings dividerKey={dividerKey} />// <QuadraticSettings />
                 )}
                 {selected === "x^3" && (
-                    <LinearSettings dividerKey={dividerKey} />// <CubicSettings />
+                    <CubedSettings dividerKey={dividerKey} />// <CubicSettings />
                 )}
                 {selected === "ver" && (
-                    <LinearSettings dividerKey={dividerKey} />//  <VerticalSettings />
+                    <VerdicalSettings dividerKey={dividerKey} />//  <VerticalSettings />
                 )}
             </div>
         </div>

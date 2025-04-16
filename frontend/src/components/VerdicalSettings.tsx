@@ -1,10 +1,11 @@
 ﻿import { useState } from "react";
 import { usePlotData } from "../context/PlotDataContext";
 import MiddleTreeNode from "../models/data/MiddleTreeNode";
+import VerdicalDivider from "../models/data/VerdicalDivider";
 
-export default function LinearSettings({ dividerKey }: { dividerKey: string }) {
+export default function VerdicalSettings({ dividerKey }: { dividerKey: string }) {
     const [, forceUpdate] = useState<number>(0);
-    const { classTreeData,changeDivider } = usePlotData();
+    const { classTreeData, changeDivider } = usePlotData();
     const divider = (classTreeData.getNodeByKey(dividerKey) as MiddleTreeNode).divider;
     return (
         <div className="space-y-2">
@@ -44,7 +45,20 @@ export default function LinearSettings({ dividerKey }: { dividerKey: string }) {
                     onChange={(e) => { divider.shiftY = parseFloat(e.target.value); changeDivider(dividerKey, divider); forceUpdate((n) => n + 1); }}
                 />
             </div>
+            <div>
+                <label className="block">frequency: {(divider as VerdicalDivider).frequency}</label>
+                <input
+                    id="frequency"
+                    type="range"
+                    min={0.5}
+                    max={2}
+                    step={0.05}
+                    value={(divider as VerdicalDivider).frequency}
+                    onChange={(e) => { (divider as VerdicalDivider).frequency = parseFloat(e.target.value); changeDivider(dividerKey, divider); forceUpdate((n) => n + 1); }}
+                />
+            </div>
           
+
         </div>
     );
 }

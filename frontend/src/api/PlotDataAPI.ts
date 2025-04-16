@@ -4,7 +4,7 @@ import PlotData from "../models/data/PlotData";
 
 export const PlotAPI = async (task: string, pageKey: number, method: string): Promise<PlotData> => {
     try {
-        const response = await fetch(`${API_URL}/api/plot/${task}`, {
+        const response = await fetch(`${API_URL}/plot/${task}`, {
             method: method, 
             headers: {
                 "Content-Type": "application/json",

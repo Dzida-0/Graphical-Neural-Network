@@ -6,7 +6,9 @@ export default class LinearDivider extends DataDivider {
     }
 
     evaluate(x: number, y: number): boolean {
-        if (this.reversed) return this.a * x + this.b > y;
-        return this.a * x + this.b < y;
+        const theta = this.deg * Math.PI / 180 + Math.PI / 4 *3 ;
+        const sinT = Math.sin(theta);
+        const cosT = Math.cos(theta);
+        return cosT * (y + this.shiftY) - sinT * (x - this.shiftX) < (sinT * (y + this.shiftY) + cosT * (x - this.shiftX));
     }
 }
