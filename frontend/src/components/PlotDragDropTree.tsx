@@ -6,6 +6,7 @@ import NodeDividerSettings from "./NodeDividerSettings";
 import EndTreeNode from "../models/data/EndTreeNode";
 import MiddleTreeNode from "../models/data/MiddleTreeNode";
 import TrainingController from "./TrainingController";
+import ClassDataSettings from "./ClassDataSettings";
 
 export default function PlotDragDropTree() {
     const { classTreeData, addNode, removeNode,classesColors } = usePlotData(); // Get addNode function
@@ -217,7 +218,7 @@ export default function PlotDragDropTree() {
                 {{
                     0: () => <TrainingController />,
                     1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />,
-                    2: () => renderTree(classTreeData.root),
+                    2: () => <ClassDataSettings nodeKey={ selectedNodeKey!} />,
                 }[sideWindowShow as 0 | 1 | 2]?.()}
             </div>
 

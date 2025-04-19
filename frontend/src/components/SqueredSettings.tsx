@@ -12,6 +12,12 @@ export default function SqueredSettings({ dividerKey }: { dividerKey: string }) 
             <div>
                 <label className="block">deg (angle): {divider.deg}°</label>
                 <input
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                     id="deg"
                     type="range"
                     min={0}
@@ -24,6 +30,12 @@ export default function SqueredSettings({ dividerKey }: { dividerKey: string }) 
             <div>
                 <label className="block">shift x: {divider.shiftX}</label>
                 <input
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                     id="shiftX"
                     type="range"
                     min={-10}
@@ -36,6 +48,12 @@ export default function SqueredSettings({ dividerKey }: { dividerKey: string }) 
             <div>
                 <label className="block">shift y: {divider.shiftY}</label>
                 <input
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                     id="shiftY"
                     type="range"
                     min={-10}
@@ -48,6 +66,12 @@ export default function SqueredSettings({ dividerKey }: { dividerKey: string }) 
             <div>
                 <label className="block">width: {(divider as SquaredDivider).width}</label>
                 <input
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                     id="width"
                     type="range"
                     min={0.1}

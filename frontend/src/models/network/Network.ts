@@ -17,7 +17,7 @@ export default class Network {
             new Layer(2, 4),
             new Layer(10, 2),
             new Layer(7, 10),
-            new Layer(2, 10)
+            new Layer(2, 7)
            
         ]
     }
@@ -101,10 +101,14 @@ export default class Network {
     predict(inputs: number[]) {
         
         let outputs = inputs;
+        
         this.layers.forEach((layer: Layer) => {
             outputs = layer.layerPredict(outputs);
         });
+       
         //console.log(outputs);
         return outputs;
     }
+
+   
 }

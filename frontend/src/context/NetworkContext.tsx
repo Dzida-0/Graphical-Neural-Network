@@ -24,7 +24,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
 
     const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({
         Network: false,
-        Sliders: false,
+        Sliders: true,
     });
 
     useEffect(() => {

@@ -50,48 +50,41 @@ export default function NodeDividerSettings({ dividerKey }: { dividerKey: string
     }
 
     return (
-        <div className="p-4 space-y-4 rounded-2xl shadow-md bg-gray-200 ">
-            {/* Inline buttons */}
-            <div className="flex space-x-2">
-                {["ax+b", "sin(x)", "x^2", "x^3", "ver"].map((label) => (
-                    <label
-                        key={label}
-                        className={`px-4 py-2 rounded cursor-pointer border 
-                        ${selected === label ? "bg-blue-500 text-white" : "bg-white text-black"}`}
-                    >
-                        <input
-                            type="radio"
-                            name="function"
-                            value={label}
-                            className="hidden"
-                            checked={selected === label}
-                            onChange={() => changeDividerClass(label)}
-                        />
-                        {label}
-                    </label>
-                    
-                ))}
-            </div>
+        <div className="p-4 rounded-2xl shadow-md bg-gray-200">
+            <div className="flex flex-row space-x-4">
 
-            {/* Sliders */}
-            <div>
-                {selected === "ax+b" && (
-                    <LinearSettings dividerKey={dividerKey} />//
-                    
-                )}
-                {selected === "sin(x)" && (
-                    <SinSettings dividerKey={dividerKey} />// <SinSettings />
-                )}
-                {selected === "x^2" && (
-                    <SqueredSettings dividerKey={dividerKey} />// <QuadraticSettings />
-                )}
-                {selected === "x^3" && (
-                    <CubedSettings dividerKey={dividerKey} />// <CubicSettings />
-                )}
-                {selected === "ver" && (
-                    <VerdicalSettings dividerKey={dividerKey} />//  <VerticalSettings />
-                )}
+                {/* Function Selector (Left Column) */}
+                <div className="flex flex-col space-y-2">
+                    {["ax+b", "sin(x)", "x^2", "x^3", "ver"].map((label) => (
+                        <label
+                            key={label}
+                            className={`px-4 py-2 rounded-xl cursor-pointer border text-center transition
+          ${selected === label ? "bg-gray-800 text-white" : "bg-gray-100 text-black hover:bg-gray-300"}`}
+                        >
+                            <input
+                                type="radio"
+                                name="function"
+                                value={label}
+                                className="hidden"
+                                checked={selected === label}
+                                onChange={() => changeDividerClass(label)}
+                            />
+                            {label}
+                        </label>
+                    ))}
+                </div>
+
+                {/* Sliders (Right Column) */}
+                <div className="flex-1 p-2 rounded-xl bg-white shadow-inner">
+                    {selected === "ax+b" && <LinearSettings dividerKey={dividerKey} />}
+                    {selected === "sin(x)" && <SinSettings dividerKey={dividerKey} />}
+                    {selected === "x^2" && <SqueredSettings dividerKey={dividerKey} />}
+                    {selected === "x^3" && <CubedSettings dividerKey={dividerKey} />}
+                    {selected === "ver" && <VerdicalSettings dividerKey={dividerKey} />}
+                </div>
+
             </div>
         </div>
+
     );
 }

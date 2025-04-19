@@ -5,7 +5,7 @@ export default abstract class DataDivider {
     shiftY: number;
 
     constructor() {
-        this.deg = 45;
+        this.deg = 0;
         this.shiftX = 0;
         this.shiftY = 0;
     }

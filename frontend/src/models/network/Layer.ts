@@ -7,16 +7,20 @@ export default class Layer {
     weights: number[][];
     //
 
-    constructor(neurons: number, prevLayerneurons: number, baiesesList?: number[], weightsList?: number[][]) {
+    constructor(
+        neurons: number,
+        prevLayerNeurons: number,
+        biasesList?: number[],
+        weightsList?: number[][]
+    ) {
         this.neuronsNumber = neurons;
-        this.prevLayerNeuronsNumber = prevLayerneurons;
-        this.biases = baiesesList ?? new Array(this.neuronsNumber).fill(0);
-        this.weights = weightsList ??  Array.from({ length: this.neuronsNumber }, () =>
-            new Array(this.prevLayerNeuronsNumber).fill(0).map(() => Math.random() * 2 - 1)
+        this.prevLayerNeuronsNumber = prevLayerNeurons;
+
+        this.biases = biasesList ?? Array.from({ length: neurons }, () => Math.random() * 2 - 1);
+
+        this.weights = weightsList ?? Array.from({ length: neurons }, () =>
+            Array.from({ length: prevLayerNeurons }, () => Math.random() * 2 - 1)
         );
-
-
-
     }
 
     addNeuron() {
@@ -31,7 +35,7 @@ export default class Layer {
         this.weights.splice(neuronNumber, 1);
     }
 
-    updateBias(neuronNumber: number ,newBias: number) {
+    updateBias(neuronNumber: number, newBias: number) {
         this.biases[neuronNumber] = newBias;
     }
 
@@ -39,19 +43,42 @@ export default class Layer {
         this.weights[neuronNumber][inputNumber] = newWeight;
     }
 
-    sigmoid(x: number) { return 1 / (1 + Math.exp(-x)) }
+    sigmoid(x: number) {
+        if (x < -50) return 0;
+        if (x > 50) return 1;
+        return 1 / (1 + Math.exp(-x));
+    }
 
 
     layerPredict(inputs: number[]) {
-        const outputs = new Array(this.neuronsNumber).fill(0);
-
+        const outputs = new Array<number>(this.neuronsNumber).fill(0);
+        // console.log(outputs);
         for (let i = 0; i < this.neuronsNumber; i++) {
             let sum = this.biases[i];
+            let prew = 0;
+
+            //console.log(sum);
             for (let j = 0; j < this.prevLayerNeuronsNumber; j++) {
-                sum += inputs[j] * this.weights[i][j];
+                const weight = this.weights[i][j];
+                const input = inputs[j];
+
+                prew = sum;
+
+
+                sum += input * weight;
+                if (this.sigmoid(sum) === Infinity && !(prew === Infinity))  {
+                    console.log(this.sigmoid(prew));
+                    console.log(this.sigmoid(input));
+                    console.log(this.sigmoid(weight));
+                }
+
+
+                outputs[i] = this.sigmoid(sum);
+
             }
-            outputs[i] = this.sigmoid(sum); 
+
+            return outputs;
         }
-        return outputs;
+
     }
 }

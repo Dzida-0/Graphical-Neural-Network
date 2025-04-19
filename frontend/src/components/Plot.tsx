@@ -9,21 +9,40 @@ import MiddleTreeNode from "../models/data/MiddleTreeNode";
 
 export default function Plot() {
     const { network, predictPoints } = useNetwork();
-    const { plotData,classTreeData, generateData, dataGenerated,classesColors } = usePlotData();
+    const { plotData,classTreeData, dataGenerated,classesColors } = usePlotData();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
+        render();
+    }, [network, plotData, dataGenerated, classTreeData]);
+
+    // Resize
+    useEffect(() => {
+        const observer = new ResizeObserver(render);
+        if (containerRef.current) observer.observe(containerRef.current);
+        render();
+        return () => observer.disconnect();
+    }, []);
+
+
+    const render = () => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+        const ctx = canvas?.getContext("2d");
+        if (!canvas || !ctx) return;
+
+        const { width, height } = canvas.getBoundingClientRect();
+        const scale = window.devicePixelRatio || 1;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        ctx.scale(scale, scale);
 
         if (dataGenerated) {
             renderWithData(ctx, canvas);
         } else {
             renderWithoutData(ctx, canvas);
         }
-    }, [network, plotData, dataGenerated, classTreeData]);
+    };
 
     const renderWithoutData = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
         const width = canvas.width;
@@ -81,6 +100,7 @@ export default function Plot() {
     };
 
     const renderWithData = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+        // render canvas with pionts and predicted classes
         const size = canvas.width;
         ctx.clearRect(0, 0, size, size);
 
@@ -91,24 +111,74 @@ export default function Plot() {
                 const normX = (x / size) * 2 - 1;
                 const normY = (y / size) * 2 - 1;
                 const predictedClass = predictPoints([normX * 100, normY * 100]);
-                ctx.fillStyle = predictedClass === 0 ? "rgba(173, 216, 230, 0.5)" : "rgba(255, 182, 193, 0.5)";
+                switch (predictedClass) {
+                    case 0:
+                        ctx.fillStyle = "rgba(173, 216, 230, 0.5)"; // Blue
+                        break;
+                    case 1:
+                        ctx.fillStyle = "rgba(255, 0, 0, 0.5)"; // Red
+                        break;
+                    case 2:
+                        ctx.fillStyle = "rgba(0, 255, 0, 0.5)"; // Green
+                        break;
+                    case 3:
+                        ctx.fillStyle = "rgba(255, 255, 0, 0.5)"; // Yellow
+                        break;
+                    case 4:
+                        ctx.fillStyle = "rgba(128, 0, 128, 0.5)"; // Purple
+                        break;
+                    default:
+                        ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+                        break;
+                }
                 ctx.fillRect(x, y, resolution, resolution);
             }
         }
 
         //Points
+        const pointRadius = Math.max(size * 0.007,3); // points scaling
+
         plotData.points.forEach((point: Point) => {
-            ctx.fillStyle = point.class === 0 ? "blue" : "red";
+            switch (point.class) {
+                case 0:
+                    ctx.fillStyle = "blue";
+                    break;
+                case 1:
+                    ctx.fillStyle = "red";
+                    break;
+                case 2:
+                    ctx.fillStyle = "green";
+                    break;
+                case 3:
+                    ctx.fillStyle = "yellow";
+                    break;
+                case 4:
+                    ctx.fillStyle = "purple"; 
+                    break;
+                default:
+                    ctx.fillStyle = "gray";
+                    break;
+            }
             ctx.beginPath();
-            ctx.arc((point.x / 100 + 1) * size / 2, (point.y / 100 + 1) * size / 2, 5, 0, Math.PI * 2);
+            ctx.arc(
+                (point.x / 100 + 1) * size / 2,
+                (point.y / 100 + 1) * size / 2,
+                pointRadius,
+                0,
+                Math.PI * 2
+            );
             ctx.fill();
             ctx.stroke();
         });
     }
 
+
+
     return (
-        <div className= "border rounded-2xl shadow-md p-4 bg-gray-100">                                                                                             
-            <canvas ref={canvasRef} width={700} height={700} className="bg-white-100" />
+        <div ref={containerRef} className="border rounded-2xl shadow-md p-4 bg-gray-100 w-full">
+            <div className="relative w-full aspect-square">
+                <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
+            </div>
         </div>
     );
 }

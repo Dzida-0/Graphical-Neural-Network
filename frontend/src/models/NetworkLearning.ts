@@ -6,7 +6,7 @@ export default async function NetworkLearning(epochs: number, learningRate: numb
    
     const backpropagation = (point: Point) => {
         const outputs: number[][] = [];
-        let inputs = [point.x, point.y];
+        let inputs = [point.x / 100, point.y / 100];
 
         // Fix: Properly initialize error arrays for each layer
         const errors: number[][] = network.layers.map(layer => new Array(layer.neuronsNumber).fill(0));
@@ -39,7 +39,7 @@ export default async function NetworkLearning(epochs: number, learningRate: numb
         // Update weights and biases
         for (let layerIndex = 0; layerIndex < network.layers.length; layerIndex++) {
             const layer = network.layers[layerIndex];
-            const prevInputs = layerIndex === 0 ? [point.x, point.y] : outputs[layerIndex - 1];
+            const prevInputs = layerIndex === 0 ? [point.x / 100, point.y / 10] : outputs[layerIndex - 1];
 
             for (let i = 0; i < layer.neuronsNumber; i++) {
                 for (let j = 0; j < layer.prevLayerNeuronsNumber; j++) {
@@ -62,21 +62,26 @@ export default async function NetworkLearning(epochs: number, learningRate: numb
         let totalCost = 0;
 
         for (const point of points) {
-            const prediction = network.predict([point.x, point.y]);
+            //console.log(point);
+            const prediction = network.predict([point.x / 100, point.y / 100]);
             if (prediction.indexOf(Math.max(...prediction)) === point.class) correctPredictions++;
 
             // Compute cost
             const expectedOutput = Array.from({ length: network.outputsNumber }, (_, i) => Number(point.class === i));
-            const actualOutput = network.predict([point.x, point.y]); // Get raw outputs
+            //console.log(expectedOutput);
+            const actualOutput = network.predict([point.x / 100, point.y / 100]); // Get raw outputs
+            //console.log(actualOutput);
             totalCost += expectedOutput.reduce((sum, expected, i) => sum + CostFunction(actualOutput[i], expected), 0);
-
+            //console.log(expectedOutput);
+            //console.log(totalCost);
             backpropagation(point);
         }
 
         // Compute accuracy & cost
         const accuracy = (correctPredictions / points.length) * 100;
         const averageCost = totalCost / points.length;
-
+        //console.log(totalCost);
+        //console.log(averageCost);
         // Update UI with new metrics
         updateMetrics(accuracy, averageCost);
 
