@@ -5,7 +5,7 @@ export default function SlidersNN() {
     const { network, updateBias, updateWeight } = useNetwork();
 
     return (
-        <div className="p-4 flex gap-4 w-full overflow-x-auto">
+        <div className="p-4 flex gap-4 w-full overflow-x-auto justify-center">
             {network.layers.map((layer, layerIndex) => (
                 <SingleLayerSlider
                     layerIndex={layerIndex}
@@ -14,7 +14,7 @@ export default function SlidersNN() {
                     updateBias={updateBias}
                     updateWeight={updateWeight}
                 />
-            ))}
+             ))}
         </div>
     );
 }

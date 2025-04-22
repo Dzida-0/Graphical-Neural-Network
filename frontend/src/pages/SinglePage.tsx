@@ -20,7 +20,8 @@ export default function SinglePage({ id }: { id: number }) {
                     <Collapsible title="Sliders">
                         <SlidersNN />
                     </Collapsible>
-                        <div className="flex border rounded-2xl shadow-md p-4 gap-4 bg-white w-full h-full">
+                        <div className="flex flex-col lg:flex-row border rounded-2xl shadow-md p-4 gap-4 bg-white w-full h-full">
+
                             <div className="flex-1 flex items-center justify-center">
                                 <div className="aspect-square w-full max-w-full">
                                     <Plot />

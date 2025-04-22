@@ -6,10 +6,11 @@ import NodeDividerSettings from "./NodeDividerSettings";
 import EndTreeNode from "../models/data/EndTreeNode";
 import MiddleTreeNode from "../models/data/MiddleTreeNode";
 import TrainingController from "./TrainingController";
-import ClassDataSettings from "./ClassDataSettings";
+import { useNetwork } from "../context/NetworkContext";
 
 export default function PlotDragDropTree() {
-    const { classTreeData, addNode, removeNode,classesColors } = usePlotData(); // Get addNode function
+    const { classTreeData, addNode, removeNode, classesColors } = usePlotData(); // Get addNode function
+    const {updateClassCount } = useNetwork();
     const [sideWindowShow, setSideWindowShow] = useState<number>(0);
     const [selectedNodeKey, setSelectedNodeKey] = useState<string | null>(null);
     const [treeRenderTrigger, setTreeRenderTrigger] = useState<number>(0);
@@ -103,11 +104,6 @@ export default function PlotDragDropTree() {
         setSideWindowShow(1);
     };
 
-    const handleEndNodeClick = (targetKey: string) => {
-        setSelectedNodeKey(targetKey);
-        setSideWindowShow(2);
-    };
-
     const updateNodePositions = () => {
         requestAnimationFrame(() => {
             const positions: { [key: string]: { x: number; y: number } } = {};
@@ -139,11 +135,14 @@ export default function PlotDragDropTree() {
         if (draggedKey == "spawn") {
             nodeRefs.current = {};
             addNode(targetKey); 
+            updateClassCount(1);
+            
             setTreeRenderTrigger(prev => prev + 1);
         }
         else if (draggedKey == "delete") {
             nodeRefs.current = {};
             removeNode(targetKey); 
+            updateClassCount(-1);
             setTreeRenderTrigger(prev => prev + 1);
         }
     };
@@ -169,9 +168,8 @@ export default function PlotDragDropTree() {
                         ${selectedNodeKey === node.key ? `bg-${classesColors.get(node.value)}-700` : `bg-${classesColors.get(node.value)}-500`}`}
                         draggable={true}
                         onDragOver={handleDragOver}
-                        onDrop={(event) => handleDrop(event, node.key)} // Enable dropping
+                        onDrop={(event) => handleDrop(event, node.key)}
                         key={`t-&=${node.key}`}
-                        onClick={() => handleEndNodeClick(node.key)}
                         ref={(el) => {
                             nodeRefs.current[node.key] = el;
                         }}
@@ -217,9 +215,8 @@ export default function PlotDragDropTree() {
             <div className="p-4 bg-gray-100  w-1/2 flex flex-col items-center space-y-6" ref={sideWindowRef}>
                 {{
                     0: () => <TrainingController />,
-                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />,
-                    2: () => <ClassDataSettings nodeKey={ selectedNodeKey!} />,
-                }[sideWindowShow as 0 | 1 | 2]?.()}
+                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />
+                }[sideWindowShow as 0 | 1]?.()}
             </div>
 
             {/* Tree */}

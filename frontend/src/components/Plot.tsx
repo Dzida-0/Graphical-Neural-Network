@@ -110,7 +110,7 @@ export default function Plot() {
             for (let y = 0; y < size; y += resolution) {
                 const normX = (x / size) * 2 - 1;
                 const normY = (y / size) * 2 - 1;
-                const predictedClass = predictPoints([normX * 100, normY * 100]);
+                const predictedClass = predictPoints([normX , normY ]);
                 switch (predictedClass) {
                     case 0:
                         ctx.fillStyle = "rgba(173, 216, 230, 0.5)"; // Blue
@@ -161,8 +161,8 @@ export default function Plot() {
             }
             ctx.beginPath();
             ctx.arc(
-                (point.x / 100 + 1) * size / 2,
-                (point.y / 100 + 1) * size / 2,
+                (point.x / 10 + 1) * size / 2,
+                (point.y / 10 + 1) * size / 2,
                 pointRadius,
                 0,
                 Math.PI * 2

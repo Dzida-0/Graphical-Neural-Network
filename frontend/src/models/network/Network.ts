@@ -1,5 +1,6 @@
 ﻿import Layer from "./Layer";
 
+
 export default class Network {
     layers: Layer[];
     //
@@ -9,17 +10,13 @@ export default class Network {
     inputsNumber: number = 2;
     outputsNumber: number = 2;
     //
-    hidenLayerCount: number = 4;
+    hidenLayerCount: number = 1;
 
     constructor() {
         this.layers = [
-            new Layer(4, 2),
-            new Layer(2, 4),
-            new Layer(10, 2),
-            new Layer(7, 10),
-            new Layer(2, 7)
-           
-        ]
+            new Layer(3, 2),
+
+            new Layer(2, 3  )      ]
     }
 
 
@@ -98,12 +95,17 @@ export default class Network {
             this.layers[this.hidenLayerCount].addNeuron();
     }
 
+  
+
+
+
     predict(inputs: number[]) {
         
         let outputs = inputs;
         
         this.layers.forEach((layer: Layer) => {
-            outputs = layer.layerPredict(outputs);
+            outputs = layer.layerPredict(outputs)!;
+
         });
        
         //console.log(outputs);
@@ -112,3 +114,6 @@ export default class Network {
 
    
 }
+
+
+  

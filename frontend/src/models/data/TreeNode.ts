@@ -1,5 +1,5 @@
 ﻿
-export default class TreeNode {
+export default abstract class TreeNode {
     key: string;
 
     constructor( key: string ) {

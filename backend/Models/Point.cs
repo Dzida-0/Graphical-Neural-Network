@@ -5,9 +5,9 @@
         public int Id { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
-        public double Class { get; set; }
+        public int Class { get; set; }
 
-        public Point(int id, double posX, double posY, double piontClass)
+        public Point(int id, double posX, double posY, int piontClass)
         {
             Id = id;
             X = posX;

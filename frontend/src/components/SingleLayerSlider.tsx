@@ -19,12 +19,17 @@ export default function SingleLayerlider({ layerIndex, biases, weights, updateBi
                     <label className="text-xs">Neuron {neuronIndex}</label>
                     <input
                         type="range"
-                        min="-25"
-                        max="25"
+                        min="-10"
+                        max="10"
                         step="0.01"
                         value={bias}
                         onChange={(e) => updateBias(layerIndex, neuronIndex, parseFloat(e.target.value))}
-                        className="w-40"
+                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                     />
                     <span className="text-xs">{bias.toFixed(2)}</span>
                 </div>
@@ -42,14 +47,19 @@ export default function SingleLayerlider({ layerIndex, biases, weights, updateBi
                                     <label className="text-xs">→ {weightIndex}</label>
                                     <input
                                         type="range"
-                                        min="-25"
-                                        max="25"
+                                        min="-10"
+                                        max="10"
                                         step="0.01"
                                         value={weight}
                                         onChange={(e) =>
                                             updateWeight(layerIndex, neuronIndex, weightIndex, parseFloat(e.target.value))
                                         }
-                                        className="w-40"
+                                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer 
+             [&::-webkit-slider-thumb]:appearance-none 
+             [&::-webkit-slider-thumb]:h-5 
+             [&::-webkit-slider-thumb]:w-5
+             [&::-webkit-slider-thumb]:rounded-full 
+             [&::-webkit-slider-thumb]:bg-gray-600 hover:[&::-webkit-slider-thumb]:bg-gray-800"
                                     />
                                     <span className="text-xs">{weight.toFixed(2)}</span>
                                 </div>

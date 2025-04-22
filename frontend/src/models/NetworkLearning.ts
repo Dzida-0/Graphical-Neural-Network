@@ -1,12 +1,178 @@
 ﻿import Point from "./data/Point";
 import Network from "./network/Network";
 
-export default async function NetworkLearning(epochs: number, learningRate: number, points: Point[], network: Network,
-    updateMetrics: (accuracy: number, cost: number) => void) {
-   
+export default async function NetworkLearning(
+    epochs: number,
+    learningRate: number,
+    batchSize: number,
+    allPoints: Point[],
+    activation: string,
+    cost: string,
+    optimizerType: string,
+    network: Network,
+    updateMetrics: (accuracy: number, cost: number) => void
+)
+{ 
+    const optimizer = createOptimizer(optimizerType, learningRate);
+
+    function createOptimizer(type: string, learningRate: number) {
+        const vW: number[][][] = [];
+        const vB: number[][] = [];
+        const mW: number[][][] = [];
+        const mB: number[][] = [];
+        let t = 1;
+        const beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8;
+
+        return {
+            update: (
+                weights: number[][],
+                biases: number[],
+                gradientsW: number[][],
+                gradientsB: number[],
+                layerIndex: number
+            ) => {
+                if (!vW[layerIndex]) {
+                    vW[layerIndex] = gradientsW.map(r => r.map(() => 0));
+                    vB[layerIndex] = gradientsB.map(() => 0);
+                    mW[layerIndex] = gradientsW.map(r => r.map(() => 0));
+                    mB[layerIndex] = gradientsB.map(() => 0);
+                }
+
+                switch (type) {
+                    case 'sgd':
+                        for (let i = 0; i < weights.length; i++) {
+                            for (let j = 0; j < weights[i].length; j++) {
+                                weights[i][j] -= learningRate * gradientsW[i][j];
+                            }
+                            biases[i] -= learningRate * gradientsB[i];
+                        }
+                        break;
+
+                    case 'momentum':
+                        const momentum = 0.9;
+                        for (let i = 0; i < weights.length; i++) {
+                            for (let j = 0; j < weights[i].length; j++) {
+                                vW[layerIndex][i][j] = momentum * vW[layerIndex][i][j] - learningRate * gradientsW[i][j];
+                                weights[i][j] += vW[layerIndex][i][j];
+                            }
+                            vB[layerIndex][i] = momentum * vB[layerIndex][i] - learningRate * gradientsB[i];
+                            biases[i] += vB[layerIndex][i];
+                        }
+                        break;
+
+                    case 'adam':
+                        for (let i = 0; i < weights.length; i++) {
+                            for (let j = 0; j < weights[i].length; j++) {
+                                mW[layerIndex][i][j] = beta1 * mW[layerIndex][i][j] + (1 - beta1) * gradientsW[i][j];
+                                vW[layerIndex][i][j] = beta2 * vW[layerIndex][i][j] + (1 - beta2) * Math.pow(gradientsW[i][j], 2);
+                                const mHat = mW[layerIndex][i][j] / (1 - Math.pow(beta1, t));
+                                const vHat = vW[layerIndex][i][j] / (1 - Math.pow(beta2, t));
+                                weights[i][j] -= learningRate * mHat / (Math.sqrt(vHat) + epsilon);
+                            }
+
+                            mB[layerIndex][i] = beta1 * mB[layerIndex][i] + (1 - beta1) * gradientsB[i];
+                            vB[layerIndex][i] = beta2 * vB[layerIndex][i] + (1 - beta2) * Math.pow(gradientsB[i], 2);
+                            const mHatB = mB[layerIndex][i] / (1 - Math.pow(beta1, t));
+                            const vHatB = vB[layerIndex][i] / (1 - Math.pow(beta2, t));
+                            biases[i] -= learningRate * mHatB / (Math.sqrt(vHatB) + epsilon);
+                        }
+                        t++;
+                        break;
+                }
+            }
+        };
+    }
+
+
+
+    function getRandomBatch(batchSize: number, allPoints: Point[]): Point[] {
+        const sampleCount = Math.floor((batchSize / 100) * allPoints.length);
+        const shuffled = [...allPoints].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, sampleCount);
+    }
+
+
+    // activation function
+    type DerivativeFunction = (output: number) => number;
+    let activationDeriv: DerivativeFunction;
+    function clamp(value: number, min: number, max: number): number {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    switch (activation) {
+        case "sigmoid":
+            activationDeriv = (y) => clamp(y * (1 - y), 0.0001, 1);
+            break;
+
+        case "tanh":
+            activationDeriv = (y) => clamp(1 - y * y, 0.0001, 1);
+            break;
+
+        case "relu":
+            activationDeriv = (y) => (y > 0 ? 1 : 0); // already limited
+            break;
+
+        case "leakyrelu":
+            activationDeriv = (y) => (y > 0 ? 1 : 0.01); // already limited
+            break;
+
+        case "elu":
+            activationDeriv = (y) => clamp(y >= 0 ? 1 : y + 1.0, -1, 1); // rough bound
+            break;
+
+        case "swish":
+            // handle edge cases and bound log-domain
+            activationDeriv = (y) => {
+                y = clamp(y, 1e-5, 1 - 1e-5);
+                const result = y + (1 - y) * Math.log(y / (1 - y));
+                return clamp(result, -1, 1);
+            };
+            break;
+
+    }
+
+    // cost function 
+    type CostFunction = (output: number[], expected: number[]) => number;
+    type CostDerivativeFunction = (output: number, expected: number) => number;
+    let costFunction: CostFunction;
+    let costDerivative: CostDerivativeFunction;
+
+    switch (cost) {
+        case "mse": 
+            costFunction = (output, expected) =>
+                output.reduce((sum, o, i) => sum + Math.pow(o - expected[i], 2), 0) / output.length;
+
+            costDerivative = (output, expected) =>
+                2 * (output - expected);
+            break;
+
+        case "crossentropy": 
+            costFunction = (output, expected) =>
+                -output.reduce((sum, o, i) => sum + expected[i] * Math.log(o + 1e-9), 0); 
+
+            costDerivative = (output, expected) =>
+                -(expected / (output + 1e-9)); 
+            break;
+
+        case "hinge": 
+            costFunction = (output, expected) =>
+                output.reduce((sum, o, i) => {
+                    const y = expected[i] * 2 - 1;  
+                    return sum + Math.max(0, 1 - y * o);
+                }, 0);
+
+            costDerivative = (output, expected) => {
+                const y = expected * 2 - 1;
+                return y * output < 1 ? -y : 0;
+            };
+            break;
+    }
+
+
+
     const backpropagation = (point: Point) => {
         const outputs: number[][] = [];
-        let inputs = [point.x / 100, point.y / 100];
+        let inputs = [point.x / 20 + 0.5, point.y / 20 + 0.5];
 
         // Fix: Properly initialize error arrays for each layer
         const errors: number[][] = network.layers.map(layer => new Array(layer.neuronsNumber).fill(0));
@@ -14,12 +180,17 @@ export default async function NetworkLearning(epochs: number, learningRate: numb
         // Forward Pass
         network.layers.forEach((layer) => {
             inputs = layer.layerPredict(inputs);
+
+            // Apply dropout if enabled
+            //if (dropout > 0) {
+                //inputs = applyDropout(inputs, dropout);  // Apply dropout here after getting the layer output
+           // }
             outputs.push(inputs);
         });
 
         // Compute error for output layer
         for (let i = 0; i < network.outputsNumber; i++) {
-            errors[errors.length - 1][i] = CostDerv(outputs[outputs.length - 1][i], point.expectedOutput[i]) * ActivationDerv(outputs[outputs.length - 1][i]);
+            errors[errors.length - 1][i] = costDerivative(outputs[outputs.length - 1][i], point.expectedOutput[i]) * activationDeriv(outputs[outputs.length - 1][i]);
         }
 
         // Backpropagate errors through hidden layers
@@ -32,46 +203,50 @@ export default async function NetworkLearning(epochs: number, learningRate: numb
                 for (let j = 0; j < nextLayer.neuronsNumber; j++) {
                     errorSum += errors[layerIndex + 1][j] * nextLayer.weights[j][i];
                 }
-                errors[layerIndex][i] = errorSum * ActivationDerv(outputs[layerIndex][i]);
+                errors[layerIndex][i] = errorSum * activationDeriv(outputs[layerIndex][i]);
             }
         }
 
-        // Update weights and biases
+        // === ✅ Weight and bias update using optimizer ===
         for (let layerIndex = 0; layerIndex < network.layers.length; layerIndex++) {
             const layer = network.layers[layerIndex];
-            const prevInputs = layerIndex === 0 ? [point.x / 100, point.y / 10] : outputs[layerIndex - 1];
+            const prevInputs = layerIndex === 0
+                ? [point.x / 20 + 0.5, point.y / 20 + 0.5]
+                : outputs[layerIndex - 1];
 
-            for (let i = 0; i < layer.neuronsNumber; i++) {
-                for (let j = 0; j < layer.prevLayerNeuronsNumber; j++) {
-                    layer.weights[i][j] -= learningRate * errors[layerIndex][i] * prevInputs[j];
-                }
-                layer.biases[i] -= learningRate * errors[layerIndex][i];
-            }
+            // 🔹 This is what you asked to see:
+            const gradientsW = layer.weights.map((row, i) =>
+                row.map((_, j) => errors[layerIndex][i] * prevInputs[j])
+            );
+            const gradientsB = errors[layerIndex];
+
+            // 🔹 Optimizer does the actual update:
+            optimizer.update(layer.weights, layer.biases, gradientsW, gradientsB, layerIndex);
         }
     };
 
-    const CostFunction = (output: number, expected: number) => Math.pow(output - expected, 2); // Mean Squared Error
 
-    // Cost function and derivatives
-    const CostDerv = (output: number, expected: number) => 2 * (output - expected);
-    const ActivationDerv = (output: number) => 1 - Math.pow(output, 2);
 
     // Main training loop
     for (let epoch = 0; epoch < epochs; epoch++) {
+        const points = getRandomBatch(batchSize, allPoints);
         let correctPredictions = 0;
         let totalCost = 0;
 
+        //if (dropout > 0)
+          //  dropout = Math.max(0.2, dropout - 0.01); 
+
         for (const point of points) {
             //console.log(point);
-            const prediction = network.predict([point.x / 100, point.y / 100]);
+            const prediction = network.predict([point.x / 20 + 0.5, point.y / 20 + 0.5]);
             if (prediction.indexOf(Math.max(...prediction)) === point.class) correctPredictions++;
 
             // Compute cost
             const expectedOutput = Array.from({ length: network.outputsNumber }, (_, i) => Number(point.class === i));
             //console.log(expectedOutput);
-            const actualOutput = network.predict([point.x / 100, point.y / 100]); // Get raw outputs
+            const actualOutput = network.predict([point.x / 20 + 0.5, point.y / 20 + 0.5]); // Get raw outputs
             //console.log(actualOutput);
-            totalCost += expectedOutput.reduce((sum, expected, i) => sum + CostFunction(actualOutput[i], expected), 0);
+            totalCost += costFunction(actualOutput, expectedOutput);
             //console.log(expectedOutput);
             //console.log(totalCost);
             backpropagation(point);

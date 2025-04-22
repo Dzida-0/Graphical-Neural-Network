@@ -1,28 +1,32 @@
 ﻿const API_URL = "http://localhost:5001";
 
-import PlotData from "../models/data/PlotData";
-
-export const PlotAPI = async (task: string, pageKey: number, method: string): Promise<PlotData> => {
+export const updatePlot = async (task: string, PageId: number, Data: object) => {
     try {
-        const response = await fetch(`${API_URL}/plot/${task}`, {
-            method: method, 
+
+        await fetch(`${API_URL}/plot/${task}`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                pageId: pageKey,
-                pointCount: 200,
+                PageId,
+                Data,
             }),
         });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        return Object.assign(new PlotData(), data);
     } catch (error) {
-        console.error("Failed to fetch data:", error);
-        throw error; 
+        console.error("Failed to update plot data:", error);
+    }
+};
+
+export const getPlot = async (pageKey: number) => {
+    try {
+        const response = await fetch(`${API_URL}/plot/${pageKey}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch plot data.");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching plot data:", error);
+        return null;
     }
 };

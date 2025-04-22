@@ -7,18 +7,14 @@
         public int MaxNeurons { get; set; } = 10;
         public int InputsNumber { get; set; } = 2;
         public int OutputsNumber { get; set; } = 2;
-        public int HiddenLayerCount { get; set; } = 4;
+        public int HiddenLayerCount { get; set; } = 0;
         public Dictionary<string, bool> Collapsed { get; set; } = new Dictionary<string, bool> {{ "Network", false },{ "Sliders", true} };
 
         public Network()
         {
             Layers = new List<Layer>
             {
-                new Layer(4, 2),
-                new Layer(2, 4),
-                new Layer(10, 2),
-                new Layer(7, 10),
-                new Layer(2, 7)
+                new Layer(2, 2)
             };
         }
 

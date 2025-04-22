@@ -46,7 +46,7 @@ export default class Layer {
     sigmoid(x: number) {
         if (x < -50) return 0;
         if (x > 50) return 1;
-        return 1 / (1 + Math.exp(-x));
+        return x*(x-1);
     }
 
 

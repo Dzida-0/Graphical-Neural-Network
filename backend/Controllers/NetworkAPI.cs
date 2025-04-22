@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Graphic_Neural_Network.backend.Controllers
 {
@@ -35,7 +36,7 @@ namespace Graphic_Neural_Network.backend.Controllers
 
             if (request.Data.TryGetValue("layerIndex", out var value) && value != null)
             {
-                int layerIndex = ((JsonElement)value).GetInt32();
+                int layerIndex = Convert.ToInt32(value);
                 network.AddNode(layerIndex);
                 return Ok(network);
             }
@@ -54,15 +55,14 @@ namespace Graphic_Neural_Network.backend.Controllers
                 return BadRequest("Network with the given 'PageId' does not exist.");
             }
 
-            if (request.Data.TryGetValue("layerIndex", out var value) &&
-                request.Data.TryGetValue("neuronIndex", out var value2) &&
-                value is JsonElement layerElem &&
-                value2 is JsonElement neuronElem)
+            if (request.Data.TryGetValue("layerIndex", out var value) && value != null &&
+                request.Data.TryGetValue("neuronIndex", out var value2) && value2 != null)
+           
             {
                 try
                 {
-                    int layerIndex = layerElem.GetInt32();
-                    int neuronIndex = neuronElem.GetInt32();
+                    int layerIndex = Convert.ToInt32(value);
+                    int neuronIndex = Convert.ToInt32(value2);
                     network.RemoveNode(layerIndex, neuronIndex);
                     return Ok(network);
                 }
@@ -86,7 +86,7 @@ namespace Graphic_Neural_Network.backend.Controllers
 
             if (request.Data.TryGetValue("index", out var value) && value != null)
             {
-                int index = ((JsonElement)value).GetInt32();
+                int index = Convert.ToInt32(value);
                 network.AddLayer(index);
                 return Ok(network);
             }
@@ -107,7 +107,7 @@ namespace Graphic_Neural_Network.backend.Controllers
 
             if (request.Data.TryGetValue("index", out var value) && value != null)
             {
-                int index = ((JsonElement)value).GetInt32();
+                int index = Convert.ToInt32(value);
                 network.RemoveLayer(index);
                 return Ok(network);
             }
@@ -120,7 +120,7 @@ namespace Graphic_Neural_Network.backend.Controllers
         [HttpPost("UpdB")]
         public ActionResult<Network> UpdateBiases([FromBody] NetworkRequest request)
         {
-            
+
             if (!_memoryCache.TryGetValue(request.PageId, out Network network))
             {
                 return BadRequest("Network with the given 'PageId' does not exist.");
@@ -130,9 +130,9 @@ namespace Graphic_Neural_Network.backend.Controllers
                 request.Data.TryGetValue("neuronIndex", out var ni) && ni != null &&
                 request.Data.TryGetValue("newBias", out var nb) && nb != null)
             {
-                int layerIndex = ((JsonElement)li).GetInt32();
-                int neuronIndex = ((JsonElement)ni).GetInt32();
-                double newBias = ((JsonElement)nb).GetDouble();
+                int layerIndex  = Convert.ToInt32(li);
+                int neuronIndex = Convert.ToInt32(ni);
+                double newBias = Convert.ToDouble(nb);
 
                 network.UpdateBiases(layerIndex, neuronIndex, newBias);
                 return Ok(network);
@@ -146,7 +146,7 @@ namespace Graphic_Neural_Network.backend.Controllers
         [HttpPost("UpdW")]
         public ActionResult<Network> UpdateWeights([FromBody] NetworkRequest request)
         {
-            
+
             if (!_memoryCache.TryGetValue(request.PageId, out Network network))
             {
                 return BadRequest("Network with the given 'PageId' does not exist.");

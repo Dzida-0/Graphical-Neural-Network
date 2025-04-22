@@ -104,7 +104,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork);
             newNetwork.updateBaies(layerNumber, neuronNumber, newBias);
-            updateNetwork("UpdB", pageId, { layerNumber: layerNumber, neuronNumber: neuronNumber, newBias: newBias });
+            updateNetwork("UpdB", pageId, { layerIndex: layerNumber, neuronIndex: neuronNumber, newBias: newBias });
             return newNetwork;
         });
     }
@@ -114,7 +114,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
             const newNetwork = new Network();
             Object.assign(newNetwork, prevNetwork);
             newNetwork.updateWeight(layerNumber, neuronNumber, inputNumber, newWeight);
-            updateNetwork("UpdW", pageId, { layerNumber: layerNumber, neuronNumber: neuronNumber, inputNumber: inputNumber, newWeight: newWeight });
+            updateNetwork("UpdW", pageId, { layerIndex: layerNumber, neuronIndex: neuronNumber, inputIndex: inputNumber, newWeight: newWeight });
             return newNetwork;
         });
     }
