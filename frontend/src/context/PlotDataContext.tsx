@@ -37,11 +37,11 @@ export const PlotDataProvider: React.FC<{ children: React.ReactNode; pageId: num
     const [classTreeData, setClassTreeData] = useState(new Tree());
     const [dataGenerated, setDataGenerated] = useState<boolean>(false);
     const classesColors = new Map<string, string>([
-        ["A", "blue"],
-        ["B", "green"],
-        ["C", "red"],
-        ["D", "yellow"],
-        ["E", "purple"]
+        ["A", "blue"],  // blue
+        ["B", "green"],  // green
+        ["C", "red"],  // red
+        ["D", "yellow"],  // yellow
+        ["E", "purple"],  // purple
     ]);
     const [seed, setNewSeed] = useState<number>(1);
 
@@ -109,10 +109,10 @@ export const PlotDataProvider: React.FC<{ children: React.ReactNode; pageId: num
      
         try {
             
-            await updatePlot("Gen", pageId, {});
-            
-            setDataGenerated(true);
+            updatePlot("Gen", pageId, {});
             fetchPlot();
+            setDataGenerated(true);
+            
         } catch (error) {
             console.error("Error in generateData:", error);
         }

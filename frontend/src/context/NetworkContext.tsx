@@ -2,6 +2,7 @@
 import Network from "../models/network/Network";
 import { updateNetwork, getNetwork } from "./../api/NetworkAPI";
 import Layer from "../models/network/Layer";
+import getActivation from "../models/network/Activation";
 
 interface NetworkContextInterface {
     network: Network;
@@ -15,12 +16,17 @@ interface NetworkContextInterface {
     updateClassCount: (count: number) => void;
     collapsed: { [key: string]: boolean };
     updateCollapsed: (key: string, value: boolean) => void;
+    regenerateNetwork: () => void; 
+    updateActivationFunction: (activation: string) => void;
 }
 
 const NetworkContext = createContext<NetworkContextInterface | undefined>(undefined);
 
 export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: number }> = ({ children, pageId }) => {
     const [network, setNetwork] = useState<Network>(new Network());
+    const [activationFunction, setActivationFunction] = useState<(inputs: number[]) => number[]>(
+        getActivation("sigmoid").activationFunction
+    );
 
     const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({
         Network: false,
@@ -35,7 +41,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
                 Object.assign(loaded, fetched);
 
                 // Reconstruct each Layer from plain object to real class instance
-                loaded.layers = fetched.layers.map((layerData: any) => {
+                loaded.layers = fetched.layers.map((layerData: Layer) => {
                     const layer = new Layer(layerData.neuronsNumber, layerData.prevLayerNeuronsNumber);
                     layer.biases = [...layerData.biases];
                     layer.weights = layerData.weights.map((w: number[]) => [...w]);
@@ -47,6 +53,43 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
         };
         fetchNetwork();
     }, [pageId]);
+
+    const updateActivationFunction = (activate: string) => {
+        setActivationFunction(() => (inputs: number[]) => getActivation(activate).activationFunction(inputs))
+    }
+
+    const regenerateNetwork = () => {
+        setNetwork((prevNetwork) => {
+            const newNetwork = new Network();
+            Object.assign(newNetwork, prevNetwork);
+            newNetwork.regenerateNetwork();
+
+            network.layers.forEach((layer: Layer, layerIndex: number) => {
+                // Call for all biases
+                layer.biases.forEach((bias, neuronIndex) => {
+                    updateNetwork("UpdB", pageId, {
+                        layerIndex,
+                        neuronIndex,
+                        newBias: bias
+                    });
+                });
+
+                // Call for all weights
+                layer.weights.forEach((neuronWeights, neuronIndex) => {
+                    neuronWeights.forEach((weight, inputIndex) => {
+                        updateNetwork("UpdW", pageId, {
+                            layerIndex,
+                            neuronIndex,
+                            inputIndex,
+                            newWeight: weight
+                        });
+                    });
+                });
+            });
+
+            return newNetwork;
+        });
+    };
 
 
     const addNeuron = (layerIndex: number) => {
@@ -130,7 +173,7 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
     }
 
     const predictPoints = (inputs: number[]) => {
-        const outputs = network.predict(inputs);
+        const outputs = network.predict(inputs, activationFunction);
         return outputs.indexOf(Math.max(...outputs));
     };
 
@@ -144,7 +187,10 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode; pageId: numb
     };
 
     return (
-        <NetworkContext.Provider value={{ network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight, updateClassCount, collapsed, updateCollapsed }}>
+        <NetworkContext.Provider value={{
+            network, addNeuron, removeNeuron, addLayer, removeLayer, predictPoints, updateBias, updateWeight, updateClassCount,
+            collapsed, updateCollapsed, regenerateNetwork, updateActivationFunction
+        }}>
             {children}
         </NetworkContext.Provider>
     );

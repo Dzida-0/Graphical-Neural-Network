@@ -6,7 +6,7 @@ export default function DragDropNN() {
     const { network, addNeuron, removeNeuron,addLayer } = useNetwork();
     const [draggedNeuron, setDraggedNeuron] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [newNeuronDragging, setNewNeuronDragging] = useState(false);
+    const [newNeuronDragging, setNewNeuronDragging] = useState(true);
     const [maxNeurons, setMaxNeurons] = useState(Math.max(...network.layers.map(layer => layer.neuronsNumber), 1));
     const [neuronPositions, setNeuronPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
     const neuronRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -45,25 +45,40 @@ export default function DragDropNN() {
         removeNeuron(oldLayer, neuronIndex);
         setDraggedNeuron(null);
         setIsDragging(false);
+ 
     };
 
     const handleCreate = (e: React.MouseEvent) => {
         e.preventDefault();
         setNewNeuronDragging(true);
         setDraggedNeuron("new_0"); 
-        setIsDragging(true);
+        setIsDragging(false);
     };
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const updateNeuronPositions = () => {
-        const positions: { [key: string]: { x: number; y: number } } = {};
-        Object.entries(neuronRefs.current).forEach(([key, ref]) => {
-            if (ref) {
-                const rect = ref.getBoundingClientRect();
-                positions[key] = { x: rect.x - rect.width/ 2, y: rect.y -210 }; // Center of neuron
-            }
+        requestAnimationFrame(() => {
+            if (!containerRef.current) return;
+
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const positions: { [key: string]: { x: number; y: number } } = {};
+
+            Object.entries(neuronRefs.current).forEach(([key, ref]) => {
+                if (ref) {
+                    const rect = ref.getBoundingClientRect();
+                    positions[key] = {
+                        x: rect.left + rect.width / 2 - containerRect.left ,
+                        y: rect.top + rect.height / 2 - containerRect.top - 80,
+                    };
+                }
+            });
+
+            setNeuronPositions(positions);
         });
-        setNeuronPositions(positions);
     };
+
+
 
     useEffect(() => {
         updateNeuronPositions();
@@ -71,7 +86,6 @@ export default function DragDropNN() {
         return () => window.removeEventListener("resize", updateNeuronPositions);
     }, [network]); // Re-run when the network changes or window is resized
 
-    const [animatedLines, setAnimatedLines] = useState(new Set());
 
     const drawConnections = () => {
         const grayLines: JSX.Element[] = [];
@@ -79,15 +93,15 @@ export default function DragDropNN() {
 
         const getLineProps = (startKey: string, endKey: string) => {
             if (!hoveredNeuron || startKey === hoveredNeuron || endKey === hoveredNeuron) {
-                return { stroke: "black", strokeWidth: "3.5", animated: false }; // Black lines stay solid
+                return { stroke: "black", strokeWidth: "3.5" }; // Black lines stay solid
             }
-            return { stroke: "gray", strokeWidth: "1.0", animated: true }; // Gray lines animate
+            return { stroke: "gray", strokeWidth: "1.0"}; // Gray lines animate
         };
 
         const addConnection = (startKey: string, endKey: string, startX: number, startY: number, endX: number, endY: number) => {
-            const { stroke, strokeWidth, animated } = getLineProps(startKey, endKey);
-            const lineLength = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2); // Calculate line length
-            const isAnimating = animated && !animatedLines.has(`${startKey}-${endKey}`);
+            const { stroke, strokeWidth} = getLineProps(startKey, endKey);
+            //const lineLength = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2); // Calculate line length
+            
 
             const line = (
                 <line
@@ -98,11 +112,7 @@ export default function DragDropNN() {
                     y2={endY}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
-                    strokeDasharray={animated ? lineLength : "0"}
-                    strokeDashoffset={isAnimating ? lineLength : "0"}
-                    style={{
-                        transition: isAnimating ? "stroke-dashoffset 1.6s linear" : "none",
-                    }}
+                  
                 />
             );
 
@@ -112,12 +122,7 @@ export default function DragDropNN() {
                 grayLines.push(line);
             }
 
-            // Trigger animation after render
-            if (isAnimating) {
-                setTimeout(() => {
-                    setAnimatedLines((prev) => new Set(prev).add(`${startKey}-${endKey}`));
-                }, 10);
-            }
+          
         };
 
         // Input layer connections
@@ -163,30 +168,33 @@ export default function DragDropNN() {
         return [...grayLines, ...blackLines]; // Gray lines first, black lines on top
     };
 
-    useEffect(() => {
-        setAnimatedLines(new Set()); // Reset animation on hover changes
-    }, [hoveredNeuron]);
-
-
-
     return (
-        <div className="relative flex flex-col bg-gray-100 w-full overflow-x-auto" style={{
-            minHeight: `${Math.max(500, maxNeurons * 40) + 150}px`
-        }}>
+        <div
+            ref={containerRef}
+            className="relative flex flex-col bg-gray-100 w-full overflow-x-auto"
+            style={{
+                minHeight: `${Math.max(500, maxNeurons * 40) + 150}px`
+            }}
+        >
+
             {/* Controls */}
             <div className="flex items-center justify-center p-4 bg-gray-300">
                 {/*  ➕ */}
-                <button
-                    className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
-                    onClick={handleCreate}
-                >
-                    ➕
-                </button>
+                {!isDragging && (
+                    <button
+                        className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
+                        //onClick={handleCreate}
+                        draggable
+                        onDragStart={() => setDraggedNeuron("new_0")}
+                        onDragEnd={(e) => handleCreate(e) }
+                    >
+                        ➕
+                    </button>)}
 
                 {/* ✖ */}
                 {isDragging && (
                     <div
-                        className="w-12 h-12 ml-4 rounded-full bg-red-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
+                        className="w-12 h-12  rounded-full bg-red-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-pointer"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={handleRemove}
                     >
@@ -267,7 +275,7 @@ export default function DragDropNN() {
 
                                         onDragStart={() => handleDragStart(layerIndex, neuronIndex)}
                                     >
-                                        {layer.biases?.[neuronIndex] ?? ""}
+                                        {(layer.biases?.[neuronIndex] ?? 0).toFixed(2)}
                                     </div>
                                 ))}
                             </div>
@@ -283,7 +291,7 @@ export default function DragDropNN() {
                 </div>
 
                 {/* Connections  */}
-                <div className="absolute w-full h-full pointer-events-none">
+                <div className="absolute w-full h-full pointer-events-none ">
                     <svg className="w-full h-full">{drawConnections()}</svg>
                 </div>
 
@@ -369,7 +377,7 @@ export default function DragDropNN() {
                                         onMouseEnter={() => setHoveredNeuron(`${layerIndex}-${neuronIndex}`)}
                                         onMouseLeave={() => setHoveredNeuron(null)}
                                     >
-                                        {layer.biases?.[neuronIndex] ?? ""}
+                                        {(layer.biases?.[neuronIndex] ?? 0).toFixed(2)}
                                     </div>
                                 ))}
                             </div>
@@ -387,16 +395,7 @@ export default function DragDropNN() {
                 
             </div>
 
-            {/*  new neuron */}
-            {newNeuronDragging && (
-                <div
-                    className="absolute top-24 left-1/2 transform -translate-x-1/2 w-10 h-10 rounded-full bg-blue-500 border-2 border-black text-white flex items-center justify-center font-bold cursor-grabbing"
-                    draggable
-                    onDragStart={() => setDraggedNeuron("new_0")}
-                >
-                    +
-                </div>
-            )}
+         
         </div>
     );
 }

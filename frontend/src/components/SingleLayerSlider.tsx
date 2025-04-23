@@ -9,14 +9,14 @@ interface SingleLayerliderInterface {
 
 export default function SingleLayerlider({ layerIndex, biases, weights, updateBias, updateWeight }: SingleLayerliderInterface) {
     return (
-        <div className="p-4 border-2 border-gray-400 rounded-lg bg-white shadow-md w-80">
+        <div className="p-4 border-2 border-gray-400 rounded-lg bg-white shadow-md min-w-[260px]">
             <h3 className="text-lg font-bold text-center">Layer {layerIndex}</h3>
 
             {/* Bias */}
             <h4 className="text-sm font-semibold mt-2">Biases:</h4>
             {biases.map((bias, neuronIndex) => (
                 <div key={neuronIndex} className="flex items-center space-x-2">
-                    <label className="text-xs">Neuron {neuronIndex}</label>
+                    <label className="text-xs p-2">B{neuronIndex+1}</label>
                     <input
                         type="range"
                         min="-10"
@@ -41,10 +41,10 @@ export default function SingleLayerlider({ layerIndex, biases, weights, updateBi
                     <h4 className="text-sm font-semibold mt-2">Weights:</h4>
                     {weights.map((weightsRow, neuronIndex) => (
                         <div key={neuronIndex} className="mb-2">
-                            <p className="text-xs">Neuron {neuronIndex} Weights:</p>
+                            <p className="text-xs">N{neuronIndex+1} Weights:</p>
                             {weightsRow.map((weight, weightIndex) => (
                                 <div key={`${layerIndex}_${neuronIndex}_${weightIndex}`} className="flex items-center space-x-2">
-                                    <label className="text-xs">→ {weightIndex}</label>
+                                    <label className="text-xs p-2">W{weightIndex+1}</label>
                                     <input
                                         type="range"
                                         min="-10"

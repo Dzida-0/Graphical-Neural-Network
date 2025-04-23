@@ -73,12 +73,12 @@ export default class Layer {
                 }
 
 
-                outputs[i] = this.sigmoid(sum);
+                outputs[i] = sum //this.sigmoid(sum);
 
             }
 
-            return outputs;
+            
         }
-
+        return outputs;
     }
 }

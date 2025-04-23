@@ -208,24 +208,5 @@ namespace Graphic_Neural_Network.backend.Controllers
             return Ok(network);
         }
 
-        [HttpPost("remove")]
-        public ActionResult<string> RemoveNetwork([FromBody] NetworkRequest request)
-        {
-           
-            if (!_memoryCache.TryGetValue(request.PageId, out Network network))
-            {
-                return BadRequest("Network with the given 'PageId' does not exist.");
-            }
-
-            _memoryCache.Remove(request.PageId);
-            return Ok("Network removed");
-        }
-
-        [HttpPost("cleanup")]
-        public IActionResult Cleanup()
-        {
-            HttpContext.Session.Clear();
-            return Ok("Session cleared");
-        }
     }
 }

@@ -9,7 +9,7 @@ import TrainingController from "./TrainingController";
 import { useNetwork } from "../context/NetworkContext";
 
 export default function PlotDragDropTree() {
-    const { classTreeData, addNode, removeNode, classesColors } = usePlotData(); // Get addNode function
+    const { classTreeData, addNode, removeNode, classesColors } = usePlotData(); 
     const {updateClassCount } = useNetwork();
     const [sideWindowShow, setSideWindowShow] = useState<number>(0);
     const [selectedNodeKey, setSelectedNodeKey] = useState<string | null>(null);
@@ -165,7 +165,7 @@ export default function PlotDragDropTree() {
                 >
                     <div
                         className={`w-12 h-12 text-white rounded-full flex items-center justify-center 
-                        ${selectedNodeKey === node.key ? `bg-${classesColors.get(node.value)}-700` : `bg-${classesColors.get(node.value)}-500`}`}
+                        bg-${classesColors.get(node.value)}-400`}
                         draggable={true}
                         onDragOver={handleDragOver}
                         onDrop={(event) => handleDrop(event, node.key)}
@@ -210,16 +210,18 @@ export default function PlotDragDropTree() {
     };
 
     return (
+        
         <div className="flex p-2 border rounded-2xl shadow-md p-4 bg-gray-100">  
             {/* Side window */}
             <div className="p-4 bg-gray-100  w-1/2 flex flex-col items-center space-y-6" ref={sideWindowRef}>
                 {{
-                    0: () => <TrainingController />,
-                    1: () => <NodeDividerSettings dividerKey={selectedNodeKey!} />
+        
+                    0: () => <TrainingController fun={setSideWindowShow } />,
+                    1: () => <NodeDividerSettings dividerKey={"0"} />
                 }[sideWindowShow as 0 | 1]?.()}
             </div>
-
-            {/* Tree */}
+            
+            {/* Tree 
             <div className="p-6 bg-gray-200 rounded-2xl shadow-md flex flex-col items-center space-y-6">
                 <h2 className="text-lg font-bold mb-4">Tree Structure</h2>
                 <div>
@@ -240,18 +242,21 @@ export default function PlotDragDropTree() {
                 </div>
             
                 <div className="relative">
-                    
-                    {/* Conections */}
+                    */}
+                    {/* Conections 
                     <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
                         {drawConnections()}
                     </svg>
-                    {/* Nodes */}
+                    */}
+                    {/* Nodes 
                     <div className="relative">
                         {renderTree(classTreeData.root)}
                     </div>          
                 </div>
-            </div>
+            </div >
+            */}
         
-        </div>
+        </div >
+       
     );
 }

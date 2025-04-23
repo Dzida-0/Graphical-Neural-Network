@@ -90,7 +90,27 @@ export default function Plot() {
                 const color = classesColors.get(classId);
                 if (!color) continue;
 
-                ctx.fillStyle = color;
+                switch (color) {
+                    case "blue":
+                        ctx.fillStyle = "blue"; 
+                        break;
+                    case "red":
+                        ctx.fillStyle = "red"; 
+                        break;
+                    case "green":
+                        ctx.fillStyle = "red"; 
+                        break;
+                    case "yellow":
+                        ctx.fillStyle = "yellow"; 
+                        break;
+                    case "purple":
+                        ctx.fillStyle = "purple";
+                        break;
+                    default:
+                        ctx.fillStyle = "gray"; 
+                        break;
+                }
+
 
                 const px = Math.floor(toCanvasX(x));
                 const py = Math.floor(toCanvasY(y));
@@ -108,8 +128,9 @@ export default function Plot() {
         const resolution = 2;
         for (let x = 0; x < size; x += resolution) {
             for (let y = 0; y < size; y += resolution) {
-                const normX = (x / size) * 2 - 1;
-                const normY = (y / size) * 2 - 1;
+                const normX = (x / size) ;
+                const normY = (y / size) ;
+                //console.log([normX, normY]);
                 const predictedClass = predictPoints([normX , normY ]);
                 switch (predictedClass) {
                     case 0:

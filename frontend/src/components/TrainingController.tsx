@@ -3,9 +3,13 @@ import { useNetwork } from "../context/NetworkContext";
 import { usePlotData } from "../context/PlotDataContext";
 import NetworkLearning from "../models/NetworkLearning";
 
-export default function TrainingController() {
-    const { network, updateBias, updateWeight } = useNetwork();
-    const { plotData, generateData,dataGenerated,seed , setSeed } = usePlotData();
+type TrainingControllerProps = {
+    fun: (newValue: number) => void;
+};
+
+export default function TrainingController({ fun }: TrainingControllerProps) {
+    const { network, updateBias, updateWeight, regenerateNetwork, updateActivationFunction } = useNetwork();
+    const { plotData, generateData,dataGenerated } = usePlotData();
 
     const [isTraining, setIsTraining] = useState(false);
     const [accuracy, setAccuracy] = useState(0);
@@ -34,7 +38,8 @@ export default function TrainingController() {
         if (!network) return;
         setIsTraining(true);
         
-        await NetworkLearning(epochOptions[epochIndex], learningRates[learningRateIndex], batchPercents[batchIndex], plotData.points, activation, selectedCost,selectedOptimizer, network, updateMetrics);
+        await NetworkLearning(epochOptions[epochIndex], learningRates[learningRateIndex], batchPercents[batchIndex], plotData.points, activation,
+            selectedCost, selectedOptimizer, network, updateMetrics);
 
         // ✅ Update weights and biases in the network context
         network.layers.forEach((layer, layerIndex) => {
@@ -67,7 +72,7 @@ export default function TrainingController() {
             {/* Generate & Train Buttons */}
             <div className="flex gap-2">
                 <button
-                    onClick={() => generateData()}
+                    onClick={() => { generateData(); generateData(); }}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${!dataGenerated
                             ? "bg-blue-500 hover:bg-blue-600"
                             : isTraining
@@ -91,7 +96,9 @@ export default function TrainingController() {
             </div>
 
             {/* regenarate network & seed */}
-            <div className="gap-2">
+            
+            <div className="gap-2 flex">
+                {/*
                 <label className="flex justify-between items-center text-sm text-gray-700">
                     <span className="font-bold">Seed:</span>
                     <input
@@ -101,8 +108,10 @@ export default function TrainingController() {
                         className="w-36 px-2 py-1 border rounded-md shadow-sm  appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                 </label>
+                 */ }
+                
                 <button
-                    onClick={startTraining}
+                    onClick={regenerateNetwork}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isTraining
                         ? "bg-gray-400"
                         : "bg-green-500 hover:bg-green-600"
@@ -111,6 +120,17 @@ export default function TrainingController() {
                 >
                     Regenerate Network
                 </button>
+                <button
+                    onClick={() => fun(1)}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isTraining
+                        ? "bg-gray-400"
+                        : "bg-red-500 hover:bg-red-600"
+                        } text-white`}
+                    disabled={isTraining}
+                >
+                    Change Generator
+                </button>
+               
             </div>
 
             {/* Learning Rate */}
@@ -212,7 +232,6 @@ export default function TrainingController() {
                     <option value="sgd">SGD</option>
                     <option value="momentum">Momentum</option>
                     <option value="adam">Adam</option>
-                    <option value="rmsprop">RMSProp</option>
                 </select>
             </label>
 
@@ -221,7 +240,7 @@ export default function TrainingController() {
                 <span className="mb-1">Activation Function:</span>
                 <select
                     value={activation}
-                    onChange={(e) => setActivation(e.target.value)}
+                    onChange={(e) => { setActivation(e.target.value); updateActivationFunction(e.target.value) }}
                     className="px-2 py-1 border rounded-md shadow-sm"
                 >
                     <option value="sigmoid">Sigmoid</option>
@@ -229,7 +248,6 @@ export default function TrainingController() {
                     <option value="relu">ReLU</option>
                     <option value="leakyrelu">Leaky ReLU</option>
                     <option value="elu">ELU</option>
-                    <option value="swish">Swish</option>
                 </select>
             </label>
 
@@ -243,7 +261,6 @@ export default function TrainingController() {
                 >
                     <option value="mse">Mean Squared Error</option>
                     <option value="crossentropy">Cross Entropy</option>
-                    <option value="hinge">Hinge Loss</option>
                 </select>
             </label>
 

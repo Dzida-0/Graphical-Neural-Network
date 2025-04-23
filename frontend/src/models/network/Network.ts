@@ -16,7 +16,16 @@ export default class Network {
         this.layers = [
             new Layer(3, 2),
 
-            new Layer(2, 3  )      ]
+            new Layer(2, 3)]
+    }
+
+    regenerateNetwork() {
+        this.layers.forEach((layer: Layer) => {
+            layer.biases = Array.from({ length: layer.neuronsNumber }, () => Math.random() * 2 - 1);
+            layer.weights = Array.from({ length: layer.neuronsNumber }, () =>
+                Array.from({ length: layer.prevLayerNeuronsNumber }, () => Math.random() * 2 - 1));
+
+        });
     }
 
 
@@ -96,21 +105,17 @@ export default class Network {
     }
 
   
+    activationFunctiond(inputs: number[]) { return inputs.map(x => 1 / (1 + Math.exp(-x)))}
 
 
-
-    predict(inputs: number[]) {
-        
+    predict(inputs: number[], activationFunction: (inputs: number[]) => number[]) {
         let outputs = inputs;
-        
         this.layers.forEach((layer: Layer) => {
             outputs = layer.layerPredict(outputs)!;
-
         });
-       
-        //console.log(outputs);
-        return outputs;
+        return this.activationFunctiond(outputs);
     }
+
 
    
 }

@@ -1,4 +1,4 @@
-﻿import { NetworkProvider } from "./../context/NetworkContext";
+﻿import { NetworkProvider } from "../context/NetworkContext";
 import  DragDropNN  from "./../components/DragDropNN";
 import { PlotDataProvider } from "./../context/PlotDataContext";
 import Plot from "./../components/Plot";
