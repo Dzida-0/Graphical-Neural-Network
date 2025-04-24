@@ -28,7 +28,7 @@ Graphic Neural Network is an interactive web application designed for experiment
 
 1. **Move to frontend catalog**:
    ```bash
-   cd ./frontend/
+   cd .\frontend\
    ```
 
 2. **Install dependencies**:
